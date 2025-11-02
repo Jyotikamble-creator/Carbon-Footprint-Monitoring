@@ -1,0 +1,142 @@
+Carbon Footprint Monitoring API Routes
+
+- AUTH
+  - POST /v1/auth/signup
+    - Body: { org_name: string, email: string (email), password: string }
+    - Response: { user_id: number }
+  - POST /v1/auth/login
+    - Body: { email: string (email), password: string }
+    - Response: { user_id: number }
+  - GET /v1/auth/me
+    - Auth: required (current user)
+    - Response: {
+        id: number,
+        email: string (email),
+        role: string,
+        org: { id: number, name: string, plan: string }
+      }
+
+- TENANTS
+  - POST /v1/tenants/facilities
+    - Auth: admin
+    - Body: { name: string, country?: string (ISO-2), grid_region?: string }
+    - Response (201): { id: number, name: string, country?: string, grid_region?: string }
+  - GET /v1/tenants/facilities
+    - Auth: viewer|analyst|admin
+    - Query: none
+    - Response: [ { id: number, name: string, country?: string, grid_region?: string } ]
+  - POST /v1/tenants/users
+    - Auth: admin
+    - Body: { email: string (email), password: string (>=8), role: "admin"|"analyst"|"viewer" }
+    - Response (201): { id: number, email: string (email), role: string, is_active: boolean }
+  - GET /v1/tenants/users
+    - Auth: admin
+    - Query: none
+    - Response: [ { id: number, email: string (email), role: string, is_active: boolean } ]
+
+- INGEST
+  - POST /v1/ingest/events
+    - Auth: analyst|admin
+    - Body: {
+        events: [
+          {
+            occurred_at: string (ISO-8601),
+            category: string,
+            unit: string,
+            value_numeric: number (>=0),
+            facility_id?: number,
+            source_id?: string,
+            subcategory?: string,
+            currency?: string,
+            spend_value?: number (>=0)
+          }
+        ]
+      }
+    - Response: { created_events: number, skipped_duplicates: number, created_emissions: number }
+  - POST /v1/ingest/upload-csv
+    - Auth: analyst|admin
+    - Form-Data: file: CSV (columns: occurred_at, category, unit, value_numeric)
+    - Response: { created_events: number, skipped_duplicates: number, created_emissions: number }
+
+- FACTORS
+  - POST /v1/factors
+    - Auth: admin
+    - Body: {
+        namespace?: string (default "global"),
+        category: string,
+        unit_in: string,
+        unit_out: string,
+        factor_value: number (>=0),
+        gwp_horizon?: number (default 100),
+        geography?: string (default "GLOBAL"),
+        vendor: string,
+        method: string,
+        valid_from: string (ISO-8601),
+        valid_to: string (ISO-8601),
+        version?: number (default 1)
+      }
+    - Response (201): {
+        id: number,
+        namespace: string,
+        category: string,
+        unit_in: string,
+        unit_out: string,
+        factor_value: number,
+        gwp_horizon: number,
+        geography: string,
+        vendor: string,
+        method: string,
+        valid_from: string (ISO-8601),
+        valid_to: string (ISO-8601),
+        version: number
+      }
+  - GET /v1/factors
+    - Auth: viewer|analyst|admin
+    - Query: category?: string, geography?: string, valid_on?: string (ISO-8601)
+    - Response: [ FactorOut as above ]
+  - GET /v1/factors/preview
+    - Auth: viewer|analyst|admin
+    - Query: category: string, occurred_at: string (ISO-8601), geography?: string
+    - Response: { id: number, category: string, geography: string, version: number, factor_value: number }
+
+- EMISSIONS
+  - GET /v1/emissions
+    - Auth: viewer|analyst|admin
+    - Query: from?: string (ISO-8601), to?: string (ISO-8601), limit?: number [1..1000] (default 100), offset?: number >=0 (default 0)
+    - Response: [ { id: number, event_id: number, factor_id: number, scope: string, co2e_kg: number, occurred_at: string (ISO-8601), category: string } ]
+  - POST /v1/emissions/recompute
+    - Auth: admin
+    - Body: { since?: string (ISO-8601), until?: string (ISO-8601) }
+    - Response: { recalculated_events: number }
+
+- ANALYTICS
+  - GET /v1/analytics/kpis
+    - Auth: viewer|analyst|admin
+    - Query: from: string (ISO-8601), to: string (ISO-8601)
+    - Response: { total_co2e_kg: number, scope1_kg: number, scope2_kg: number, scope3_kg: number }
+  - GET /v1/analytics/trend
+    - Auth: viewer|analyst|admin
+    - Query: grain?: "day"|"month" (default "day"), from: string (ISO-8601), to: string (ISO-8601)
+    - Response: [ { period: string (YYYY-MM-DD), co2e_kg: number } ]
+  - GET /v1/analytics/summary
+    - Auth: viewer|analyst|admin
+    - Query: none
+    - Response: {
+        total_co2e_kg: number,
+        scope1_kg: number,
+        scope2_kg: number,
+        scope3_kg: number,
+        facilities_count: number,
+        last_event_at: string|null (ISO-8601),
+        top_categories: [ [category: string, co2e_kg: number], ... ]
+      }
+
+- REPORTS
+  - GET /v1/reports/period
+    - Auth: viewer|analyst|admin
+    - Query: from: string (ISO-8601), to: string (ISO-8601)
+    - Response: text/csv (streamed). Columns: emission_id,event_id,occurred_at,category,unit,value_numeric,scope,co2e_kg
+
+Notes
+- All endpoints are served under FastAPI app with CORS enabled.
+- Auth requirements listed per endpoint; unauthorized requests return standard HTTP errors.

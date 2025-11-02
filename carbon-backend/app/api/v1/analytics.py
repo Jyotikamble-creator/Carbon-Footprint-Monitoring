@@ -78,35 +78,40 @@ class SummaryOut(BaseModel):
     top_categories: list[tuple[str, float]]
 
 
-@router.get("/summary", response_model=SummaryOut)
-def summary(db: Session = Depends(get_db), user: Annotated[User, Depends(require_role("viewer", "analyst", "admin"))] = None):
+@router.get("/summary")
+def summary(id: int = Query(..., description="Organization ID"), db: Session = Depends(get_db), user: Annotated[User, Depends(require_role("viewer", "analyst", "admin"))] = None):
+    org_id = id
+    
     totals_stmt = select(
         func.coalesce(func.sum(Emission.co2e_kg), 0),
         func.coalesce(func.sum(case((Emission.scope == "1", Emission.co2e_kg), else_=0)), 0),
         func.coalesce(func.sum(case((Emission.scope == "2", Emission.co2e_kg), else_=0)), 0),
         func.coalesce(func.sum(case((Emission.scope == "3", Emission.co2e_kg), else_=0)), 0),
-    ).where(Emission.org_id == user.org_id)
+    ).where(Emission.org_id == org_id)
     total, s1, s2, s3 = db.execute(totals_stmt).one()
 
-    facilities_count = db.scalar(select(func.count()).select_from(Facility).where(Facility.org_id == user.org_id))
-    last_ev = last_event_time(db, org_id=user.org_id)
+    facilities_count = db.scalar(select(func.count()).select_from(Facility).where(Facility.org_id == org_id))
+    last_ev = last_event_time(db, org_id=org_id)
 
     top_stmt = (
         select(ActivityEvent.category, func.coalesce(func.sum(Emission.co2e_kg), 0))
         .join(ActivityEvent, ActivityEvent.id == Emission.event_id)
-        .where(Emission.org_id == user.org_id)
+        .where(Emission.org_id == org_id)
         .group_by(ActivityEvent.category)
         .order_by(func.coalesce(func.sum(Emission.co2e_kg), 0).desc())
         .limit(5)
     )
     top = [(r[0], float(r[1] or 0)) for r in db.execute(top_stmt)]
 
-    return SummaryOut(
-        total_co2e_kg=float(total or 0),
-        scope1_kg=float(s1 or 0),
-        scope2_kg=float(s2 or 0),
-        scope3_kg=float(s3 or 0),
-        facilities_count=int(facilities_count or 0),
-        last_event_at=last_ev,
-        top_categories=top,
-    )
+    summary_dict = {
+        "id": org_id,
+        "total_co2e_kg": float(total or 0),
+        "scope1_kg": float(s1 or 0),
+        "scope2_kg": float(s2 or 0),
+        "scope3_kg": float(s3 or 0),
+        "facilities_count": int(facilities_count or 0),
+        "last_event_at": last_ev.isoformat() if last_ev else None,
+        "top_categories": [{"category": cat, "co2e_kg": kg} for cat, kg in top],
+    }
+    
+    return summary_dict
