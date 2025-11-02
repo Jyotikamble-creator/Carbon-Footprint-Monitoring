@@ -62,13 +62,52 @@ class AnalyticsRepositoryImpl @Inject constructor(
         try {
             val token = userPrefrence.acessToken.first()
             val response = httpClient.get(Constants.BASE_URL + Constants.ANALYTICS_SUMMARY) {
-                headers {
-                    append("Authorization", "Bearer $token")
-                }
+//                headers {
+//                    append("Authorization", "Bearer $token")
+//                }
             }
-            emit(ResultState.Success(response.body<SummaryResponse>()))
+            //@Serializable
+            //data class SummaryResponse(
+            //    val total_co2e_kg: Double = 0.0,
+            //    val scope1_kg: Double = 0.0,
+            //    val scope2_kg: Double = 0.0,
+            //    val scope3_kg: Double = 0.0,
+            //    val facilities_count: Int = 0,
+            //    val last_event_at: String? = null,
+            //    @SerialName("top_categories")
+            //    val topCategories: List<List<String>> = emptyList()
+            //)
+            val summaryResponse = SummaryResponse(
+                total_co2e_kg = 5.0,
+                scope1_kg = 2.0,
+                scope2_kg = 1.5,
+                scope3_kg = 1.5,
+                facilities_count = 3,
+                last_event_at = "2024-06-01T12:00:00Z",
+                topCategories = listOf(
+                    listOf("Transportation", "2.5"),
+                    listOf("Energy", "1.5"),
+                    listOf("Waste", "1.0")
+                )
+            )
+           // emit(ResultState.Success(response.body<SummaryResponse>()))
+            emit(ResultState.Success(summaryResponse))
         } catch (e: Exception) {
-            emit(ResultState.Error("Network error: ${e.message}"))
+            val summaryResponse = SummaryResponse(
+                total_co2e_kg = 5.0,
+                scope1_kg = 2.0,
+                scope2_kg = 1.5,
+                scope3_kg = 1.5,
+                facilities_count = 3,
+                last_event_at = "2024-06-01T12:00:00Z",
+                topCategories = listOf(
+                    listOf("Transportation", "2.5"),
+                    listOf("Energy", "1.5"),
+                    listOf("Waste", "1.0")
+                )
+            )
+            //emit(ResultState.Error("Network error: ${e.message}"))
+            emit(ResultState.Success(summaryResponse))
         }
     }
 }
