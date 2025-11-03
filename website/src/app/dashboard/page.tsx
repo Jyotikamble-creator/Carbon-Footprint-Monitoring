@@ -4,6 +4,20 @@ import StatsCards from '@/components/dashboard/StatsCards';
 import EmissionsTrend from '@/components/dashboard/EmissionTrend';
 import EmissionsByScope from '@/components/dashboard/EmissionByScope';
 
+// Temporary debug component
+function AuthDebug() {
+  if (typeof window === 'undefined') return null;
+  
+  const token = localStorage.getItem('token');
+  return (
+    <div className="bg-blue-900/50 border border-blue-700 rounded-lg p-4 mb-4">
+      <h3 className="text-blue-400 font-semibold mb-2">Debug Info:</h3>
+      <p className="text-blue-300 text-sm">Token exists: {token ? 'Yes' : 'No'}</p>
+      {token && <p className="text-blue-300 text-sm">Token preview: {token.substring(0, 20)}...</p>}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
@@ -11,6 +25,9 @@ export default function DashboardPage() {
         <DashboardHeader />
         
         <main className="max-w-7xl mx-auto px-6 py-8">
+          {/* Temporary Debug Info */}
+          <AuthDebug />
+          
           {/* Page Title and Filter */}
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-4xl font-bold text-white">Emissions Dashboard</h1>

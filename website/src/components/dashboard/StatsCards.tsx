@@ -27,8 +27,15 @@ export default function StatsCards() {
         const data = await getKpis(from, to);
         setKpis(data);
       } catch (err) {
-        console.error('Failed to fetch KPIs:', err);
-        setError('Failed to load KPIs');
+        console.error('Failed to fetch KPIs - Full error details:', {
+          error: err,
+          message: err instanceof Error ? err.message : 'Unknown error',
+          stack: err instanceof Error ? err.stack : undefined,
+          status: (err as any)?.status,
+          response: (err as any)?.response,
+          config: (err as any)?.config
+        });
+        setError(`Failed to load KPIs: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
         setLoading(false);
       }
