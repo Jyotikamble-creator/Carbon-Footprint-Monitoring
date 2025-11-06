@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.nutrino.carbonfootprint.presentation.screens.OverViewScreen
 import com.nutrino.carbonfootprint.presentation.screens.SignInScreen
 import com.nutrino.carbonfootprint.presentation.screens.SignUpScreen
+import com.nutrino.carbonfootprint.presentation.screens.SuggestionScreen
 import com.nutrino.carbonfootprint.presentation.viewmodels.UserPreferenceViewModel
 
 @Composable
@@ -60,6 +61,10 @@ fun MainApp(userPreferenceViewModel: UserPreferenceViewModel = hiltViewModel()) 
 
         composable<OVER_VIEW_SCREEN> {
             OverViewScreen(navController = navController)
+
+        composable<SUGGESTION_SCREEN> {
+            SuggestionScreen(navController = navController)
+        }
         }
     }
 

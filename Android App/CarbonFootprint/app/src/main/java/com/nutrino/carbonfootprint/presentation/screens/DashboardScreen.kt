@@ -2,6 +2,9 @@ package com.nutrino.carbonfootprint.presentation.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.nutrino.carbonfootprint.presentation.navigation.SUGGESTION_SCREEN
 import com.nutrino.carbonfootprint.presentation.state.KpisUIState
 import com.nutrino.carbonfootprint.presentation.state.SummaryUIState
 import com.nutrino.carbonfootprint.presentation.viewmodels.AnalyticsViewmodel
@@ -20,6 +25,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
+    navController: NavController? = null,
     analyticsViewmodel: AnalyticsViewmodel = hiltViewModel()
 ) {
     val kpisState by analyticsViewmodel.kpisState.collectAsStateWithLifecycle()
@@ -51,6 +57,59 @@ fun DashboardScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
+        }
+
+        // AI Suggestions Card
+        navController?.let {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    onClick = {
+                        navController.navigate(SUGGESTION_SCREEN)
+                    }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Lightbulb,
+                                contentDescription = "AI Suggestions",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Column {
+                                Text(
+                                    text = "AI-Powered Suggestions",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Text(
+                                    text = "Get personalized recommendations",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                )
+                            }
+                        }
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = "View",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
         }
 
         // KPIs Section
@@ -203,7 +262,7 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun MetricCard(
+fun MetricCard(
     title: String,
     value: String,
     color: androidx.compose.ui.graphics.Color,

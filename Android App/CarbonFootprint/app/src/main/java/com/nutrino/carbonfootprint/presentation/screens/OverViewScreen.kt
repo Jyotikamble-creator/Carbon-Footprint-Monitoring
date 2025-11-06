@@ -29,7 +29,7 @@ fun OverViewScreen(navController: NavController) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<DASHBOARD_SCREEN> {
-                DashboardScreen()
+                DashboardScreen(navController = bottomNavController)
             }
 
             composable<DATA_INGESTION_SCREEN> {
@@ -41,7 +41,7 @@ fun OverViewScreen(navController: NavController) {
             }
 
             composable<ANALYTICS_SCREEN> {
-                DashboardScreen() // Reuse dashboard for now
+                DashboardScreen(navController = bottomNavController) // Reuse dashboard for now
             }
 
             composable<PROFILE_SCREEN> {
@@ -52,6 +52,10 @@ fun OverViewScreen(navController: NavController) {
                         }
                     }
                 )
+            }
+
+            composable<SUGGESTION_SCREEN> {
+                SuggestionScreen(navController = bottomNavController)
             }
         }
     }

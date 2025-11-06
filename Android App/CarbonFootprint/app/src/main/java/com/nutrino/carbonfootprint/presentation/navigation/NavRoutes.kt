@@ -25,3 +25,7 @@ object ANALYTICS_SCREEN
 
 @Serializable
 object PROFILE_SCREEN
+
+@Serializable
+object SUGGESTION_SCREEN
+

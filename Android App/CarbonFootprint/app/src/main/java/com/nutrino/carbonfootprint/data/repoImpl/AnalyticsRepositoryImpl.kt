@@ -3,6 +3,7 @@ package com.nutrino.carbonfootprint.data.repoImpl
 import com.nutrino.carbonfootprint.constants.Constants
 import com.nutrino.carbonfootprint.data.local.UserPrefrence
 import com.nutrino.carbonfootprint.data.remote.analytics.KpisResponse
+import com.nutrino.carbonfootprint.data.remote.analytics.SuggestionResponse
 import com.nutrino.carbonfootprint.data.remote.analytics.SummaryResponse
 import com.nutrino.carbonfootprint.data.remote.analytics.TrendResponse
 import com.nutrino.carbonfootprint.data.state.ResultState
@@ -108,6 +109,23 @@ class AnalyticsRepositoryImpl @Inject constructor(
             )
             //emit(ResultState.Error("Network error: ${e.message}"))
             emit(ResultState.Success(summaryResponse))
+        }
+    }
+
+    override suspend fun getSuggestion(id: Int, userId: Int): Flow<ResultState<SuggestionResponse>> = flow {
+        emit(ResultState.Loading)
+        try {
+            val token = userPrefrence.acessToken.first()
+            val response = httpClient.get(Constants.BASE_URL + Constants.ANALYTICS_SUGGESTION) {
+                headers {
+                    append("Authorization", "Bearer $token")
+                }
+                parameter("id", id)
+                parameter("user_id", userId)
+            }
+            emit(ResultState.Success(response.body<SuggestionResponse>()))
+        } catch (e: Exception) {
+            emit(ResultState.Error("Network error: ${e.message}"))
         }
     }
 }
