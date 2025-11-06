@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi.middleware.cors import CORSMiddleware
 import socket
 from app.core.middleware import request_context_middleware
