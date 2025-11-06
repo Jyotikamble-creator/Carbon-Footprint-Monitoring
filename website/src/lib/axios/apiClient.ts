@@ -32,30 +32,31 @@ apiClient.interceptors.response.use(
     }
 );
 
-// // Attach Authorization header per-request using the latest token from localStorage.
-// // This protects against races where a component issues a request before
-// // `setAuthToken` has been called, and handles cross-tab token updates.
-// apiClient.interceptors.request.use(
-//     (config) => {
-//         try {
-//             if (typeof window !== 'undefined') {
-//                 const token = localStorage.getItem('token');
-//                 if (token) {
-//                     config.headers = config.headers ?? {};
-//                     // Only set if not already set explicitly
-//                     if (!('Authorization' in (config.headers as Record<string, unknown>))) {
-//                         (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
-//                     }
-//                 } else {
-//                     // Ensure header removed when no token
-//                     if (config.headers) delete (config.headers as Record<string, unknown>).Authorization;
-//                 }
-//             }
-//         } catch (e) {
-//             // ignore - best-effort header attach
-//         }
-//         return config;
-//     },
-//     (err) => Promise.reject(err)
-// );
+// Attach Authorization header per-request using the latest token from localStorage.
+// This protects against races where a component issues a request before
+// `setAuthToken` has been called, and handles cross-tab token updates.
+apiClient.interceptors.request.use(
+    (config) => {
+        try {
+            // Only run in the browser
+            if (typeof window !== 'undefined') {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    config.headers = config.headers ?? {};
+                    // Only set Authorization if not already provided on the config
+                    if (!('Authorization' in (config.headers as Record<string, unknown>))) {
+                        (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+                    }
+                } else {
+                    // Ensure header removed when no token
+                    if (config.headers) delete (config.headers as Record<string, unknown>).Authorization;
+                }
+            }
+        } catch (e) {
+            // ignore - best-effort header attach
+        }
+        return config;
+    },
+    (err) => Promise.reject(err)
+);
 
