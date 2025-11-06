@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { listFactors, createFactor } from "@/lib/factors/api";
+import DashboardHeader from '@/components/dashboard/Header';
 import type { Factor, CreateFactorRequest } from "@/types/factors/factorstypes";
 
 export default function FactorsPage() {
@@ -29,11 +30,16 @@ export default function FactorsPage() {
     e.preventDefault();
     setError(null);
     try {
+      const now = new Date();
       const payload: CreateFactorRequest = {
         category,
         unit_in: unitIn,
         unit_out: unitOut,
         factor_value: Number(value),
+        vendor: 'unknown',
+        method: 'default',
+        valid_from: now.toISOString(),
+        valid_to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       };
       const f = await createFactor(payload);
       setItems((s) => [f, ...s]);
@@ -51,8 +57,10 @@ export default function FactorsPage() {
   }, []);
 
   return (
-    <main>
-      <h1>Factors</h1>
+    <div>
+      <DashboardHeader />
+      <main>
+        <h1>Factors</h1>
       <form onSubmit={onCreate}>
         <input placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
         <input placeholder="Unit In" value={unitIn} onChange={(e) => setUnitIn(e.target.value)} />
@@ -63,5 +71,6 @@ export default function FactorsPage() {
       {error && <pre style={{ color: 'red' }}>{error}</pre>}
       {loading ? <div>Loading...</div> : <ul>{items.map((it) => <li key={it.id}>{it.category} — {it.factor_value}</li>)}</ul>}
     </main>
+    </div>
   );
 }

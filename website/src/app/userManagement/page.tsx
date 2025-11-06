@@ -1,10 +1,11 @@
 // app/user-management/page.tsx
-'use client';
+ 'use client';
 
 import { useState } from 'react';
 import UserTable from '@/ui/userManagement/Table';
 import SearchBar from '@/ui/userManagement/SearchBar';
 import { User } from '@/types/auth/user';
+import DashboardHeader from '@/components/dashboard/Header';
 
 export default function UserManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,6 +52,7 @@ export default function UserManagementPage() {
 
   return (
     <div className="min-h-screen bg-[#0a1a1a] text-white">
+      <DashboardHeader />
       <div className="max-w-7xl mx-auto p-8">
         <div className="flex justify-between items-start mb-8">
           <div>

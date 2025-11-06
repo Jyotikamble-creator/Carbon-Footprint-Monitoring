@@ -138,6 +138,10 @@ export default function AddEmissionFactorForm() {
         unit_out: formData.unitOut,
         factor_value: parseFloat(formData.factorValue),
         valid_from: formData.validOn,
+        // Provide minimal required metadata when not supplied by the form
+        vendor: 'unknown',
+        method: 'default',
+        valid_to: new Date(new Date(formData.validOn).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         gwp_horizon: 100, // Default GWP horizon
         namespace: 'global', // Default namespace
         version: 1, // Default version

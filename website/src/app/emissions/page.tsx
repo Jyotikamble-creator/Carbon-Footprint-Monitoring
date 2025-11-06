@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { listEmissions, recomputeEmissions } from "@/lib/emissions/api";
+import DashboardHeader from '@/components/dashboard/Header';
 import type { Emission } from "@/types/emission/emissiontypes";
 
 export default function EmissionsPage() {
@@ -41,8 +42,10 @@ export default function EmissionsPage() {
   }, []);
 
   return (
-    <main>
-      <h1>Emissions</h1>
+    <div>
+      <DashboardHeader />
+      <main>
+        <h1>Emissions</h1>
       <form onSubmit={onRecompute}>
         <input placeholder="since (ISO)" value={since} onChange={(e) => setSince(e.target.value)} />
         <input placeholder="until (ISO)" value={until} onChange={(e) => setUntil(e.target.value)} />
@@ -51,6 +54,7 @@ export default function EmissionsPage() {
       {recalcResult !== null && <div>Recalculated events: {recalcResult}</div>}
       {error && <pre style={{ color: 'red' }}>{error}</pre>}
       {loading ? <div>Loading...</div> : <ul>{items.map((it) => <li key={it.id}>{it.category} — {it.co2e_kg} kg</li>)}</ul>}
-    </main>
+      </main>
+    </div>
   );
 }

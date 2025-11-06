@@ -1,34 +1,15 @@
-'use client';
+ 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { getTrend } from '@/lib/analytics/api';
+import { useTrend } from '@/lib/analytics/hooks';
 import type { TrendPoint } from '@/types/analytics/analyticstypes';
 
 export default function EmissionsTrend() {
-  const [trendData, setTrendData] = useState<TrendPoint[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const to = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const from = useMemo(() => new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], []);
 
-  useEffect(() => {
-    const fetchTrend = async () => {
-      try {
-        setLoading(true);
-        // Use a default date range for now - last 30 days
-        const to = new Date().toISOString().split('T')[0];
-        const from = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        const data = await getTrend(from, to, 'day');
-        setTrendData(data);
-      } catch (err) {
-        console.error('Failed to fetch trend data:', err);
-        setError('Failed to load trend data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTrend();
-  }, []);
+  const { data: trendData = [], isLoading: loading, isError, error } = useTrend(from, to, 'day');
 
   if (loading) {
     return (

@@ -1,8 +1,8 @@
-'use client';
+ 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { TrendingDown, TrendingUp } from 'lucide-react';
-import { getKpis } from '@/lib/analytics/api';
+import { useKpis } from '@/lib/analytics/hooks';
 import type { KpisResponse } from '@/types/analytics/analyticstypes';
 
 interface StatCard {
@@ -13,36 +13,11 @@ interface StatCard {
 }
 
 export default function StatsCards() {
-  const [kpis, setKpis] = useState<KpisResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // derive default range (last 30 days)
+  const to = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const from = useMemo(() => new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], []);
 
-  useEffect(() => {
-    const fetchKpis = async () => {
-      try {
-        setLoading(true);
-        // Use a default date range for now - last 30 days
-        const to = new Date().toISOString().split('T')[0];
-        const from = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        const data = await getKpis(from, to);
-        setKpis(data);
-      } catch (err) {
-        console.error('Failed to fetch KPIs - Full error details:', {
-          error: err,
-          message: err instanceof Error ? err.message : 'Unknown error',
-          stack: err instanceof Error ? err.stack : undefined,
-          status: (err as any)?.status,
-          response: (err as any)?.response,
-          config: (err as any)?.config
-        });
-        setError(`Failed to load KPIs: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchKpis();
-  }, []);
+  const { data: kpis, isLoading: loading, isError, error } = useKpis(from, to);
 
   if (loading) {
     return (

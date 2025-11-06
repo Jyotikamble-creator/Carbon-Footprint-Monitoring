@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { fetchFacilities, createFacility } from "@/lib/tenants/api";
+import DashboardHeader from '@/components/dashboard/Header';
 import type { Facility } from "@/types/tenants/tenantstypes";
 
 export default function FacilitiesPage() {
@@ -43,8 +44,10 @@ export default function FacilitiesPage() {
   }, []);
 
   return (
-    <main>
-      <h1>Facilities</h1>
+    <div>
+      <DashboardHeader />
+      <main>
+        <h1>Facilities</h1>
       <form onSubmit={onCreate}>
         <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <input placeholder="Country" value={country} onChange={(e) => setCountry(e.target.value)} />
@@ -62,5 +65,6 @@ export default function FacilitiesPage() {
         </ul>
       )}
     </main>
+    </div>
   );
 }

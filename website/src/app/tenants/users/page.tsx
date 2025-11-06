@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { fetchUsers, createUser } from "@/lib/tenants/api";
+import DashboardHeader from '@/components/dashboard/Header';
 import type { TenantUser } from "@/types/tenants/tenantstypes";
 
 export default function TenantUsersPage() {
@@ -43,8 +44,10 @@ export default function TenantUsersPage() {
   }, []);
 
   return (
-    <main>
-      <h1>Tenant Users</h1>
+    <div>
+      <DashboardHeader />
+      <main>
+        <h1>Tenant Users</h1>
       <form onSubmit={onCreate}>
         <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -65,5 +68,6 @@ export default function TenantUsersPage() {
         </ul>
       )}
     </main>
+    </div>
   );
 }

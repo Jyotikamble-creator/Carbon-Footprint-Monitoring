@@ -1,15 +1,18 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AddEmissionFactorForm from '@/components/admin/AddEmissionFactorForm';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import DashboardHeader from '@/components/dashboard/Header';
 
 export default function AddEmissionFactorPage() {
   return (
     <ProtectedRoute requiredRole="admin">
-      <div className="flex min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-        <AdminSidebar />
+      <div>
+        <DashboardHeader />
+        <div className="flex min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
+          <AdminSidebar />
         
-        <main className="flex-1 p-8">
-          <div className="max-w-6xl mx-auto">
+          <main className="flex-1 p-8">
+            <div className="max-w-6xl mx-auto">
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
               <span>Admin</span>
@@ -22,6 +25,7 @@ export default function AddEmissionFactorPage() {
             <AddEmissionFactorForm />
           </div>
         </main>
+        </div>
       </div>
     </ProtectedRoute>
   );

@@ -35,7 +35,13 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   }, [token, user, status, router, requiredRole]);
 
   // Show loading state while checking auth
-  if (!token || (token && !user && status === 'loading')) {
+  // If there's no token, the effect above will redirect; show nothing briefly.
+  if (!token) {
+    return null;
+  }
+
+  // If we have a token but no user yet, show a loading state while the app fetches the current user.
+  if (token && !user) {
     return (
       <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900 flex items-center justify-center">
         <div className="text-white text-center">
@@ -46,10 +52,14 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
     );
   }
 
-  // Don't render children if not authenticated
-  if (!token || !user) {
+  // If user fetch failed, redirect to the home/login page
+  if (status === 'failed' && !user) {
+    router.push('/');
     return null;
   }
+
+  // At this point we have a token and a user
+  if (!user) return null;
 
   return <>{children}</>;
 }

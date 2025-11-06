@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import AccountInformation from '@/components/profile/AccountInformation';
 import LoadingStateExample from '@/components/profile/LandingState';
+import DashboardHeader from '@/components/dashboard/Header';
 import { ProfileData } from '@/types/auth/profile';
 
 export default function ProfilePage() {
@@ -16,7 +17,8 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#0d1f1f] text-white">
-      <div className="max-w-6xl mx-auto p-8">
+      <DashboardHeader />
+  <div className="max-w-6xl mx-auto p-8">
         <h1 className="text-5xl font-bold mb-12">My Profile</h1>
 
         {isLoading ? (
