@@ -19,15 +19,11 @@ import com.nutrino.carbonfootprint.presentation.navigation.*
 fun OverViewScreen(navController: NavController) {
     val bottomNavController = rememberNavController()
 
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(navController = bottomNavController)
-        }
-    ) { innerPadding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
             navController = bottomNavController,
             startDestination = DASHBOARD_SCREEN,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.fillMaxSize()
         ) {
             composable<DASHBOARD_SCREEN> {
                 DashboardScreen(navController = bottomNavController)
@@ -39,10 +35,6 @@ fun OverViewScreen(navController: NavController) {
 
             composable<FACILITIES_SCREEN> {
                 FacilitiesScreen()
-            }
-
-            composable<ANALYTICS_SCREEN> {
-                DashboardScreen(navController = bottomNavController) // Reuse dashboard for now
             }
 
             composable<PROFILE_SCREEN> {
@@ -59,18 +51,28 @@ fun OverViewScreen(navController: NavController) {
                 SuggestionScreen(navController = bottomNavController)
             }
         }
+
+        BottomNavigationBar(
+            navController = bottomNavController,
+            modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter)
+        )
     }
 }
 
 @Composable
-private fun BottomNavigationBar(navController: NavController) {
+private fun BottomNavigationBar(
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
     NavigationBar(
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        tonalElevation = 8.dp
+        tonalElevation = 8.dp,
+        windowInsets = WindowInsets(0, 0, 0, 0)
     ) {
         NavigationBarItem(
             icon = {
@@ -183,42 +185,6 @@ private fun BottomNavigationBar(navController: NavController) {
             )
         )
 
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Analytics,
-                    contentDescription = "Analytics",
-                    tint = if (currentRoute?.contains("ANALYTICS_SCREEN") == true)
-                        MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            label = {
-                Text(
-                    "Analytics",
-                    color = if (currentRoute?.contains("ANALYTICS_SCREEN") == true)
-                        MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            selected = currentRoute?.contains("ANALYTICS_SCREEN") == true,
-            onClick = {
-                navController.navigate(ANALYTICS_SCREEN) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.primary,
-                selectedTextColor = MaterialTheme.colorScheme.primary,
-                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        )
 
         NavigationBarItem(
             icon = {
