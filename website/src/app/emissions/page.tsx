@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { listEmissions, recomputeEmissions } from "@/lib/emissions/api";
-import { Logger as logger } from '@/lib/logger';
 import DashboardHeader from '@/components/dashboard/Header';
 import type { Emission } from "@/types/emission/emissiontypes";
 
@@ -20,7 +19,6 @@ export default function EmissionsPage() {
       const res = await listEmissions();
       setItems(res);
     } catch (err) {
-      logger.e('listEmissions', err);
       setError(String(err));
     } finally {
       setLoading(false);
@@ -35,7 +33,6 @@ export default function EmissionsPage() {
       setRecalcResult(resp.recalculated_events);
       await load();
     } catch (err) {
-      logger.e('recomputeEmissions', err);
       setError(String(err));
     }
   }

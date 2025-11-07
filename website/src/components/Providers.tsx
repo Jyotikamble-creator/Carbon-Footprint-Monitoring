@@ -14,10 +14,11 @@ type Props = {
 
 export default function Providers({ children }: Props) {
   useEffect(() => {
-    // If token exists in localStorage, attempt to fetch current user
+    // If token and userId exist in localStorage, attempt to fetch current user
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      if (token) {
+      const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+      if (token && userId) {
         // Set token in axios client and Redux store
         setAuthToken(token);
         store.dispatch(setToken(token));

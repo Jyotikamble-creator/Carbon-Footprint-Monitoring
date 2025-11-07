@@ -2,13 +2,8 @@
 
 import { useState } from 'react';
 import { Edit2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
-
-interface Facility {
-  id: number;
-  name: string;
-  country: string;
-  region: string;
-}
+import { useFacilities } from '@/lib/facilities/hooks';
+import type { Facility } from '@/types/tenants/tenantstypes';
 
 interface FacilitiesTableProps {
   searchQuery: string;
@@ -16,45 +11,13 @@ interface FacilitiesTableProps {
 
 export default function FacilitiesTable({ searchQuery }: FacilitiesTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
-
-  const facilities: Facility[] = [
-    {
-      id: 1,
-      name: 'Main Production Plant',
-      country: 'USA',
-      region: 'California',
-    },
-    {
-      id: 2,
-      name: 'EU Distribution Center',
-      country: 'Germany',
-      region: 'Bavaria',
-    },
-    {
-      id: 3,
-      name: 'APAC Regional Office',
-      country: 'Singapore',
-      region: 'Central Region',
-    },
-    {
-      id: 4,
-      name: 'Northern Research Lab',
-      country: 'Canada',
-      region: 'Ontario',
-    },
-    {
-      id: 5,
-      name: 'Southern Manufacturing Hub',
-      country: 'Mexico',
-      region: 'Jalisco',
-    },
-  ];
+  const { data: facilities = [], isLoading, isError, error } = useFacilities();
 
   const filteredFacilities = facilities.filter((facility) =>
     facility.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalPages = 10;
+  const totalPages = Math.ceil(filteredFacilities.length / 10);
 
   const handleEdit = (id: number) => {
     console.log('Edit facility:', id);
@@ -70,6 +33,39 @@ export default function FacilitiesTable({ searchQuery }: FacilitiesTableProps) {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg border border-gray-700/50 overflow-hidden">
+          <div className="p-8 text-center">
+            <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading facilities...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-red-900/50 border border-red-700 rounded-lg p-6">
+          <p className="text-red-400">Failed to load facilities</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (filteredFacilities.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg border border-gray-700/50 p-8 text-center">
+          <p className="text-gray-400">No facilities found</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Table */}
@@ -84,7 +80,7 @@ export default function FacilitiesTable({ searchQuery }: FacilitiesTableProps) {
                 Country
               </th>
               <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Region
+                Grid Region
               </th>
               <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Actions
@@ -102,8 +98,8 @@ export default function FacilitiesTable({ searchQuery }: FacilitiesTableProps) {
                 <td className="py-4 px-6 text-white font-medium">
                   {facility.name}
                 </td>
-                <td className="py-4 px-6 text-gray-400">{facility.country}</td>
-                <td className="py-4 px-6 text-gray-400">{facility.region}</td>
+                <td className="py-4 px-6 text-gray-400">{facility.country || '-'}</td>
+                <td className="py-4 px-6 text-gray-400">{facility.grid_region || '-'}</td>
                 <td className="py-4 px-6">
                   <div className="flex items-center justify-end gap-2">
                     <button

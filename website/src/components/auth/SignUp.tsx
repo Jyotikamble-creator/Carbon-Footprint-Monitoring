@@ -100,6 +100,11 @@ export default function SignUpForm() {
         setErrors({
           submit: '🚨 Backend Server Not Running - The Carbon Footprint API server is not accessible. Please start the backend server on port 5000 first.'
         });
+      } else if (err.status === 400 && err.message?.includes('User already exists')) {
+        // Handle user already exists error with helpful message
+        setErrors({
+          submit: '⚠️ Account Already Exists - An account with this email address already exists. Please use the Login page to sign in with your existing credentials, or use a different email address to create a new account.'
+        });
       } else {
         console.error('🚨 SIGNUP ERROR:', err.message || 'Unknown error');
         setErrors({
@@ -254,6 +259,16 @@ export default function SignUpForm() {
         {errors.submit && (
           <div className="p-3 bg-red-900/50 border border-red-700 rounded-lg">
             <p className="text-sm text-red-400 whitespace-pre-line">{errors.submit}</p>
+            {errors.submit.includes('Account Already Exists') && (
+              <div className="mt-2">
+                <Link
+                  href="/auth/login"
+                  className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors underline"
+                >
+                  → Go to Login Page
+                </Link>
+              </div>
+            )}
           </div>
         )}
 

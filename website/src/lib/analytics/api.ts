@@ -53,8 +53,21 @@ export async function getTrend(from: string, to: string, grain?: 'day' | 'month'
 
 export async function getSummary(): Promise<SummaryResponse> {
   try {
-    const url = "/v1/analytics/summary";
+    const url = `/v1/analytics/summary`;
     return await fetchWithDedupe<SummaryResponse>(url);
+  } catch (err) {
+    throw categorizeAxiosError(err);
+  }
+}
+
+export type SuggestionsResponse = {
+  message: string;
+};
+
+export async function getSuggestions(): Promise<SuggestionsResponse> {
+  try {
+    const url = `/v1/analytics/suggestions`;
+    return await fetchWithDedupe<SuggestionsResponse>(url);
   } catch (err) {
     throw categorizeAxiosError(err);
   }

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { createFacility } from '@/lib/tenants/api';
+import { useCreateFacility } from '@/lib/facilities/hooks';
 import type { CreateFacilityRequest } from '@/types/tenants/tenantstypes';
 
 interface FormData {
@@ -20,7 +20,7 @@ interface FormErrors {
 
 export default function AddFacilityModal() {
 	const router = useRouter();
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const createFacilityMutation = useCreateFacility();
 	const [formData, setFormData] = useState<FormData>({
 		facilityName: '',
 		country: '',
@@ -97,26 +97,37 @@ export default function AddFacilityModal() {
 			return;
 		}
 
-		setIsSubmitting(true);
 		setSubmitError(null);
 
-		try {
-			const facilityData: CreateFacilityRequest = {
-				name: formData.facilityName.trim(),
-				country: formData.country,
-				grid_region: formData.region,
-			};
+		const facilityData: CreateFacilityRequest = {
+			name: formData.facilityName.trim(),
+			country: formData.country || undefined,
+			grid_region: formData.region || undefined,
+		};
 
-			await createFacility(facilityData);
-			
-			// Navigate back to facilities page on success
-			router.push('/facilities');
-		} catch (err) {
-			console.error('Failed to create facility:', err);
-			setSubmitError(err instanceof Error ? err.message : 'Failed to create facility. Please try again.');
-		} finally {
-			setIsSubmitting(false);
-		}
+		console.log('Sending facility data:', facilityData);
+		createFacilityMutation.mutate(facilityData, {
+			onSuccess: () => {
+				// Navigate back to facilities page on success
+				router.push('/facilities');
+			},
+			onError: (err: any) => {
+				console.error('Failed to create facility:', err);
+				
+				// Handle specific error types
+				if (err.status === 422) {
+					setSubmitError('Validation Error: Please check that all fields are filled correctly. The server rejected the facility data format.');
+				} else if (err.status === 400) {
+					setSubmitError('Bad Request: ' + (err.message || 'Invalid facility data provided.'));
+				} else if (err.status === 401) {
+					setSubmitError('Unauthorized: Please log in again.');
+				} else if (err.status === 500) {
+					setSubmitError('Server Error: There is an issue with the backend server. Please try again later.');
+				} else {
+					setSubmitError(err.message || 'Failed to create facility. Please try again.');
+				}
+			}
+		});
 	};
 
 	const handleCancel = () => {
@@ -257,24 +268,6 @@ export default function AddFacilityModal() {
 					)}
 				</div>
 
-				{/* Error Example (shown separately for demo) */}
-				<div className="pt-4">
-					<div className="mb-4">
-						<label className="block text-white font-medium mb-2">
-							Facility Name (with error)
-						</label>
-						<input
-							type="text"
-							placeholder="e.g., North American Headquarters"
-							className="w-full px-4 py-3 bg-slate-700/50 border border-red-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-						/>
-						<div className="flex items-center gap-2 mt-2 text-red-400 text-sm">
-							<AlertCircle className="w-4 h-4" />
-							<span>This field is required.</span>
-						</div>
-					</div>
-				</div>
-
 				{/* Submit Error */}
 				{submitError && (
 					<div className="flex items-center gap-2 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-400 text-sm">
@@ -288,18 +281,18 @@ export default function AddFacilityModal() {
 					<button
 						type="button"
 						onClick={handleCancel}
-						disabled={isSubmitting}
+						disabled={createFacilityMutation.isPending}
 						className="px-6 py-3 text-gray-300 hover:text-white border border-slate-600 rounded-lg transition-colors disabled:opacity-50"
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
-						disabled={isSubmitting}
+						disabled={createFacilityMutation.isPending}
 						className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
 						style={{ minWidth: 140 }}
 					>
-						{isSubmitting ? (
+						{createFacilityMutation.isPending ? (
 							<>
 								<Loader2 className="w-5 h-5 animate-spin" />
 								Submitting...

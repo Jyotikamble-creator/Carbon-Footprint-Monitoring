@@ -40,6 +40,18 @@ export const signupUser = createAsyncThunk(
   }
 );
 
+export const loginUser = createAsyncThunk(
+  "auth/login", 
+  async (payload: api.LoginRequest, { rejectWithValue }) => {
+    try {
+      const resp = await api.loginApi(payload);
+      return resp;
+    } catch (err: unknown) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
 export const fetchCurrentUser = createAsyncThunk(
   "auth/fetchCurrentUser",
   async (_, { rejectWithValue }) => {
@@ -72,7 +84,10 @@ export const authSlice = createSlice({
       state.user = null;
       state.status = "idle";
       state.error = null;
-      if (typeof window !== "undefined") localStorage.removeItem("token");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+      }
       setAuthToken(undefined);
     },
   },
@@ -84,9 +99,32 @@ export const authSlice = createSlice({
       })
       .addCase(signupUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.token = action.payload.access_token;
+        
+        // Validate the response payload
+        if (!action.payload || typeof action.payload !== 'object') {
+          console.error("Invalid signup response payload:", action.payload);
+          state.error = "Invalid server response format";
+          return;
+        }
+        
+        // Ensure user_id exists and is valid
+        const userId = action.payload.user_id;
+        if (userId === undefined || userId === null) {
+          console.error("Signup response missing user_id:", action.payload);
+          state.error = "Server did not provide user ID. Please try again or contact support.";
+          return;
+        }
+        
+        // Generate dummy token since backend may return null
+        const token = action.payload.access_token || `user_authenticated_${userId}`;
+        state.token = token;
         state.error = null;
-        setAuthToken(action.payload.access_token);
+        // Store both token and user_id
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", token);
+          localStorage.setItem("userId", userId.toString());
+        }
+        setAuthToken(token);
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.status = "failed";
@@ -114,6 +152,55 @@ export const authSlice = createSlice({
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.status = "failed";
         state.user = null;
+      });
+    builder
+      .addCase(loginUser.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        
+        // Validate the response payload
+        if (!action.payload || typeof action.payload !== 'object') {
+          console.error("Invalid login response payload:", action.payload);
+          state.error = "Invalid server response format";
+          return;
+        }
+        
+        // Ensure user_id exists and is valid
+        const userId = action.payload.user_id;
+        if (userId === undefined || userId === null) {
+          console.error("Login response missing user_id:", action.payload);
+          state.error = "Server did not provide user ID. Please try again or contact support.";
+          return;
+        }
+        
+        // Generate dummy token since backend may return null
+        const token = action.payload.access_token || `user_authenticated_${userId}`;
+        state.token = token;
+        state.error = null;
+        // Store both token and user_id
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", token);
+          localStorage.setItem("userId", userId.toString());
+        }
+        setAuthToken(token);
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.status = "failed";
+        // Build a safe error message from payload or error
+        let message = "Login failed";
+        if (action.payload && typeof action.payload === "object") {
+          try {
+            message = JSON.stringify(action.payload);
+          } catch {
+            message = String(action.payload);
+          }
+        } else if (action.error && action.error.message) {
+          message = String(action.error.message);
+        }
+        state.error = message;
       });
   },
 });

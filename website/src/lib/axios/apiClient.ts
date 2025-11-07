@@ -32,24 +32,35 @@ apiClient.interceptors.response.use(
     }
 );
 
-// Attach Authorization header per-request using the latest token from localStorage.
+// Attach Authorization header and user_id parameter per-request using the latest values from localStorage.
 // This protects against races where a component issues a request before
 // `setAuthToken` has been called, and handles cross-tab token updates.
 apiClient.interceptors.request.use(
     (config) => {
         try {
-            // Only run in the browser
             if (typeof window !== 'undefined') {
                 const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+                
+                // Set Authorization header
                 if (token) {
                     config.headers = config.headers ?? {};
-                    // Only set Authorization if not already provided on the config
+                    // Only set if not already set explicitly
                     if (!('Authorization' in (config.headers as Record<string, unknown>))) {
                         (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
                     }
                 } else {
                     // Ensure header removed when no token
                     if (config.headers) delete (config.headers as Record<string, unknown>).Authorization;
+                }
+
+                // Add id query parameter for authenticated requests (API expects 'id', not 'user_id')
+                if (userId && token) {
+                    config.params = config.params || {};
+                    // Only add if not already set explicitly
+                    if (!config.params.id) {
+                        config.params.id = userId;
+                    }
                 }
             }
         } catch (e) {
