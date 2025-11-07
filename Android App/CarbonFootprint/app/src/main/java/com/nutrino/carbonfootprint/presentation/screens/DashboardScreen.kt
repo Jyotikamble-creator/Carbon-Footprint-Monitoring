@@ -46,11 +46,9 @@ fun DashboardScreen(
     }
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        contentPadding = PaddingValues(vertical = 20.dp)
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 80.dp)
     ) {
         // Header
         item {
@@ -184,11 +182,12 @@ fun DashboardScreen(
                                         title = "Total CO₂e",
                                         value = "${String.format("%.2f", kpis.total_co2e_kg)} kg",
                                         color = MaterialTheme.colorScheme.primary,
-                                        icon = "🌍"
+                                        icon = "🌍",
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         MetricCard(
                                             title = "Scope 1",
@@ -335,9 +334,11 @@ fun MetricCard(
         border = androidx.compose.foundation.BorderStroke(1.5.dp, color.copy(alpha = 0.3f))
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -346,22 +347,23 @@ fun MetricCard(
             ) {
                 Text(
                     text = title,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
                 if (icon.isNotEmpty()) {
                     Text(
                         text = icon,
-                        fontSize = 20.sp
+                        fontSize = 18.sp
                     )
                 }
             }
             Text(
                 text = value,
-                fontSize = 22.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = color
+                color = color,
+                maxLines = 2
             )
         }
     }
@@ -383,7 +385,7 @@ fun SummaryRow(
             text = label,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         )
         Text(
             text = value,
@@ -429,4 +431,3 @@ fun CategoryRow(
         }
     }
 }
-

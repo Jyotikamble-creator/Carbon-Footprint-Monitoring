@@ -1,8 +1,10 @@
 package com.nutrino.carbonfootprint.presentation.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -55,8 +57,8 @@ fun DataIngestionScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(start = 24.dp, end = 24.dp, top = 24.dp)
     ) {
         // Title and subtitle
         Column(
@@ -83,6 +85,8 @@ fun DataIngestionScreen(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -289,6 +293,8 @@ fun DataIngestionScreen(
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Common Units Reference
         Card(
