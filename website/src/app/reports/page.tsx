@@ -73,10 +73,9 @@ export default function ReportsPage() {
 
   return (
     <ProtectedRoute>
-      <div>
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-emerald-900">
         <DashboardHeader />
-        <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-emerald-900 flex items-center justify-center">
-          <div className="container mx-auto px-6 py-8 w-full max-w-6xl">
+        <div className="container mx-auto px-6 py-8 w-full max-w-6xl">
             {/* Header */}
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -231,7 +230,6 @@ export default function ReportsPage() {
                 )}
               </div>
             </div>
-          </div>
         </div>
       </div>
     </ProtectedRoute>

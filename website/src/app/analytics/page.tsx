@@ -20,7 +20,6 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, 
-  TrendingDown, 
   Calendar,
   Factory,
   Leaf,
@@ -121,11 +120,9 @@ export default function AnalyticsPage() {
 
   return (
     <ProtectedRoute requiredRole="viewer">
-      <div>
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
         <DashboardHeader />
-        <div className="flex min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-         
-          <main className="flex-1 p-8">
+        <div className="container mx-auto px-6 py-8">
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-8">
           <div className="flex flex-wrap items-center gap-4 mb-4">
             <Calendar className="w-5 h-5 text-emerald-400" />
@@ -438,7 +435,6 @@ export default function AnalyticsPage() {
               </div>
             </div>
           )}
-          </main>
         </div>
       </div>
     </ProtectedRoute>

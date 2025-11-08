@@ -1,4 +1,4 @@
-import Sidebar from '@/components/layout/Sidebar';
+import Sidebar from '@/components/activities/SideBar';
 import AddActivityForm from '@/components/activities/AddActivityForm';
 
 export default function AddActivityPage() {
