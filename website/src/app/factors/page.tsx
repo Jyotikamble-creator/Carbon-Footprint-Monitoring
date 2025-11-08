@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { listFactors, createFactor } from "@/lib/factors/api";
 import DashboardHeader from '@/components/dashboard/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { Calculator, Plus, Search, AlertCircle, Activity, TrendingUp, Eye, Edit2, Trash2 } from 'lucide-react';
+import { Calculator, Plus, Search, AlertCircle, Activity, TrendingUp } from 'lucide-react';
 import type { Factor, CreateFactorRequest } from "@/types/factors/factorstypes";
 
 export default function FactorsPage() {
@@ -208,27 +208,7 @@ export default function FactorsPage() {
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => console.log('View factor details:', item.id)}
-                              className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
-                              title="View Details"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => console.log('Edit factor:', item.id)}
-                              className="p-2 text-gray-400 hover:text-emerald-400 transition-colors"
-                              title="Edit Factor"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => console.log('Delete factor:', item.id)}
-                              className="p-2 text-gray-400 hover:text-red-400 transition-colors"
-                              title="Delete Factor"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            {/* View, Edit, Delete buttons removed - functionality not implemented */}
                           </div>
                         </td>
                       </tr>

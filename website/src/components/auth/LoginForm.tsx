@@ -35,24 +35,25 @@ export default function LoginForm() {
       
       // Redirect to dashboard
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Log detailed error to console for debugging
+      const error = err as { message?: string; status?: number; name?: string; stack?: string; response?: unknown; request?: unknown };
       console.error('Login failed - Full error details:', {
-        error: err,
-        message: err.message,
-        status: err.status,
-        name: err.name,
-        stack: err.stack,
-        response: err.response,
-        request: err.request
+        error: error,
+        message: error?.message,
+        status: error?.status,
+        name: error?.name,
+        stack: error?.stack,
+        response: error?.response,
+        request: error?.request
       });
 
       // Check if this is a network error (backend not running)
-      if (err.message?.includes('Network Error') || 
-          err.message?.includes('ECONNREFUSED') ||
-          err.message?.includes('fetch') ||
-          err.name === 'ConnectionError' ||
-          err.status === 404) {
+      if (error?.message?.includes('Network Error') || 
+          error?.message?.includes('ECONNREFUSED') ||
+          error?.message?.includes('fetch') ||
+          error?.name === 'ConnectionError' ||
+          error?.status === 404) {
         console.error('🚨 BACKEND CONNECTION ERROR:');
         console.error('- Backend server is not running on port 5000');
         console.error('- Check if uvicorn is started in carbon-backend directory');
@@ -60,7 +61,7 @@ export default function LoginForm() {
         
         setError('🚨 Backend Server Not Running - Please start the backend server first.');
       } else {
-        console.error('🚨 LOGIN ERROR:', err.message || 'Unknown error');
+        console.error('🚨 LOGIN ERROR:', error?.message || 'Unknown error');
         setError('Invalid email or password. Please try again.');
       }
     } finally {

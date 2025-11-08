@@ -432,7 +432,7 @@ export default function AddEmissionFactorForm() {
               className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-vertical"
             />
             <p className="mt-2 text-sm text-gray-400">
-              Optional description to help identify this factor's purpose and scope.
+              Optional description to help identify this factor&apos;s purpose and scope.
             </p>
           </div>
 

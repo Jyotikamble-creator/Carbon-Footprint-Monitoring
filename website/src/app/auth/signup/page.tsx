@@ -1,8 +1,12 @@
 import SignUpForm from '@/components/auth/SignUpForm';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function SignUpPage() {
   return (
-  <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900 flex items-center justify-center p-6">
+  <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900 flex items-center justify-center p-6 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">

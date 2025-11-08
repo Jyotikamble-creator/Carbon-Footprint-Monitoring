@@ -1,4 +1,5 @@
 import LoginForm from '@/components/auth/LoginForm';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function LoginPage() {
   return (
@@ -23,7 +24,7 @@ export default function LoginPage() {
               </svg>
             </div>
           </div>
-          
+
           <h1 className="text-4xl font-bold text-white mb-4">
             Intelligent Emissions Management.
           </h1>
@@ -34,7 +35,10 @@ export default function LoginPage() {
       </div>
 
       {/* Right Panel */}
-  <div className="w-full lg:w-1/2 bg-linear-to-br from-gray-800 to-gray-900 flex items-center justify-center p-8">
+  <div className="w-full lg:w-1/2 bg-linear-to-br from-gray-800 to-gray-900 flex items-center justify-center p-8 relative">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
         <LoginForm />
       </div>
     </div>

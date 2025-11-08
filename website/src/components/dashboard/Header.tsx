@@ -2,19 +2,34 @@
 
 import { Sun, Moon, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { logout } from '@/lib/auth/authSlice';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 export default function DashboardHeader() {
-  const [activeTab, setActiveTab] = useState('Dashboard');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const { isDarkMode, toggleTheme } = useTheme();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAppSelector((state) => state.auth);
+
+  // Determine active tab based on current pathname
+  const getActiveTab = (path: string) => {
+    if (path === '/dashboard') return 'Dashboard';
+    if (path === '/facilities') return 'Facilities';
+    if (path === '/users') return 'Users';
+    if (path === '/factors') return 'Factors';
+    if (path === '/ingest') return 'Ingest';
+    if (path === '/analytics') return 'Analytics';
+    if (path === '/reports') return 'Reports';
+    return 'Dashboard'; // default fallback
+  };
+
+  const activeTab = getActiveTab(pathname);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -35,8 +50,6 @@ export default function DashboardHeader() {
   }
 
   const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
-    
     // Navigate to appropriate routes
     const route = tab.toLowerCase().replace(' ', '-');
     if (route === 'dashboard') {
@@ -79,7 +92,7 @@ export default function DashboardHeader() {
           <div className="flex items-center gap-4">
             {/* Theme Toggle */}
             <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
+              onClick={toggleTheme}
               className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300"
             >
               {isDarkMode ? (

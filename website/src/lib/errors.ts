@@ -10,6 +10,7 @@ export class ClientRequestError extends Error {
     this.statusText = statusText;
     this.response = response;
     this.name = "ClientRequestError";
+    Object.setPrototypeOf(this, ClientRequestError.prototype);
   }
 }
 
@@ -23,6 +24,7 @@ export class ServerResponseError extends Error {
     this.statusText = statusText;
     this.response = response;
     this.name = "ServerResponseError";
+    Object.setPrototypeOf(this, ServerResponseError.prototype);
   }
 }
 
@@ -32,6 +34,7 @@ export class SerializationError extends Error {
     super(message);
     this.originalError = originalError;
     this.name = "SerializationError";
+    Object.setPrototypeOf(this, SerializationError.prototype);
   }
 }
 
@@ -39,6 +42,7 @@ export class ConnectionError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ConnectionError";
+    Object.setPrototypeOf(this, ConnectionError.prototype);
   }
 }
 
@@ -46,6 +50,7 @@ export class TimeoutError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "TimeoutError";
+    Object.setPrototypeOf(this, TimeoutError.prototype);
   }
 }
 

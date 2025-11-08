@@ -74,24 +74,25 @@ export default function SignUpForm() {
       // On successful signup, set token and redirect to dashboard
       dispatch(setToken(result.access_token || null));
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Log detailed error to console for debugging
+      const error = err as { message?: string; status?: number; name?: string; stack?: string; response?: unknown; request?: unknown };
       console.error('Signup failed - Full error details:', {
-        error: err,
-        message: err.message,
-        status: err.status,
-        name: err.name,
-        stack: err.stack,
-        response: err.response,
-        request: err.request
+        error: error,
+        message: error?.message,
+        status: error?.status,
+        name: error?.name,
+        stack: error?.stack,
+        response: error?.response,
+        request: error?.request
       });
       
       // Check if this is a network error (backend not running)
-      if (err.message?.includes('Network Error') || 
-          err.message?.includes('ECONNREFUSED') ||
-          err.message?.includes('fetch') ||
-          err.name === 'ConnectionError' ||
-          err.status === 404) {
+      if (error?.message?.includes('Network Error') || 
+          error?.message?.includes('ECONNREFUSED') ||
+          error?.message?.includes('fetch') ||
+          error?.name === 'ConnectionError' ||
+          error?.status === 404) {
         console.error('🚨 BACKEND CONNECTION ERROR:');
         console.error('- Backend server is not running on port 5000');
         console.error('- Check if uvicorn is started in carbon-backend directory');
@@ -100,15 +101,15 @@ export default function SignUpForm() {
         setErrors({
           submit: '🚨 Backend Server Not Running - The Carbon Footprint API server is not accessible. Please start the backend server on port 5000 first.'
         });
-      } else if (err.status === 400 && err.message?.includes('User already exists')) {
+      } else if (error?.status === 400 && error?.message?.includes('User already exists')) {
         // Handle user already exists error with helpful message
         setErrors({
           submit: '⚠️ Account Already Exists - An account with this email address already exists. Please use the Login page to sign in with your existing credentials, or use a different email address to create a new account.'
         });
       } else {
-        console.error('🚨 SIGNUP ERROR:', err.message || 'Unknown error');
+        console.error('🚨 SIGNUP ERROR:', error?.message || 'Unknown error');
         setErrors({
-          submit: err.message || 'Signup failed. Please try again.'
+          submit: error?.message || 'Signup failed. Please try again.'
         });
       }
     }

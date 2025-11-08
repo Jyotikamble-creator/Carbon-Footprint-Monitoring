@@ -3,7 +3,7 @@ import { categorizeAxiosError } from "@/lib/errors";
 import type { KpisResponse, TrendPoint, SummaryResponse } from "@/types/analytics/analyticstypes";
 
 // In-flight request dedupe map. Keyed by request URL (including query params).
-const inflightRequests = new Map<string, Promise<any>>();
+const inflightRequests = new Map<string, Promise<unknown>>();
 
 async function fetchWithDedupe<T>(url: string) {
   // If there's an in-flight identical request, return the same promise.

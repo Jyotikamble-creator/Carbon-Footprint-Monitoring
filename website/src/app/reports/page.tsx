@@ -25,9 +25,10 @@ export default function ReportsPage() {
     try {
       const data = await getReportPeriod(fromDate, toDate);
       setReportData(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Report generation error:', err);
-      setError(err.message || 'Failed to generate report');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate report';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -51,8 +52,8 @@ export default function ReportsPage() {
     <ProtectedRoute>
       <div>
         <DashboardHeader />
-        <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-emerald-900">
-          <div className="container mx-auto px-6 py-8">
+        <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-emerald-900 flex items-center justify-center">
+          <div className="container mx-auto px-6 py-8 w-full max-w-6xl">
             {/* Header */}
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -63,7 +64,7 @@ export default function ReportsPage() {
             </div>
 
             {/* Main Content Card */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700/50 max-w-4xl">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700/50 w-full max-w-4xl mx-auto">
               {/* Date Range Selection */}
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-white mb-4">Select Date Range</h2>

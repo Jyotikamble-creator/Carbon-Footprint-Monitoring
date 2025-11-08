@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { useCreateFacility } from '@/lib/facilities/hooks';
 import type { CreateFacilityRequest } from '@/types/tenants/tenantstypes';
+import type { AxiosError } from 'axios';
 
 interface FormData {
 	facilityName: string;
@@ -111,20 +112,23 @@ export default function AddFacilityModal() {
 				// Navigate back to facilities page on success
 				router.push('/facilities');
 			},
-			onError: (err: any) => {
+			onError: (err: unknown) => {
 				console.error('Failed to create facility:', err);
 				
 				// Handle specific error types
-				if (err.status === 422) {
+				const error = err as AxiosError;
+				const status = error.response?.status;
+				if (status === 422) {
 					setSubmitError('Validation Error: Please check that all fields are filled correctly. The server rejected the facility data format.');
-				} else if (err.status === 400) {
-					setSubmitError('Bad Request: ' + (err.message || 'Invalid facility data provided.'));
-				} else if (err.status === 401) {
+				} else if (status === 400) {
+					const message = (error.response?.data as { message?: string })?.message || error.message || 'Invalid facility data provided.';
+					setSubmitError('Bad Request: ' + message);
+				} else if (status === 401) {
 					setSubmitError('Unauthorized: Please log in again.');
-				} else if (err.status === 500) {
+				} else if (status === 500) {
 					setSubmitError('Server Error: There is an issue with the backend server. Please try again later.');
 				} else {
-					setSubmitError(err.message || 'Failed to create facility. Please try again.');
+					setSubmitError(error.message || 'Failed to create facility. Please try again.');
 				}
 			}
 		});
