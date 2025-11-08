@@ -58,6 +58,12 @@ Carbon Footprint Monitoring API Routes
     - Form-Data: file: CSV (columns: occurred_at, category, unit, value_numeric)
     - Response: { created_events: number, skipped_duplicates: number, created_emissions: number }
 
+- ACTIVITIES
+  - GET /v1/activities
+    - Auth: viewer|analyst|admin
+    - Query: from?: string (ISO-8601), to?: string (ISO-8601), category?: string, facility_id?: number, limit?: number [1..1000] (default 50), offset?: number >=0 (default 0)
+    - Response: [ { id: number, facility_id?: number, source_id?: string, occurred_at: string (ISO-8601), category: string, subcategory?: string, unit: string, value_numeric: number, currency?: string, spend_value?: number, scope_hint?: string } ]
+
 - FACTORS
   - POST /v1/factors
     - Auth: admin

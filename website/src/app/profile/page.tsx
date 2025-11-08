@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import AccountInformation from '@/components/profile/AccountInformation';
-import LoadingStateExample from '@/components/profile/LandingState';
+import ComprehensiveSettings from '@/components/profile/ComprehensiveSettings';
 import DashboardHeader from '@/components/dashboard/Header';
 import { ProfileData } from '@/types/auth/profile';
 
@@ -26,7 +26,7 @@ export default function ProfilePage() {
         ) : (
           <>
             <AccountInformation data={profileData} />
-            <LoadingStateExample />
+            <ComprehensiveSettings />
           </>
         )}
       </div>
