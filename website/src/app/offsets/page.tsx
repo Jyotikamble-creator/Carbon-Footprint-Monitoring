@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Leaf, ShoppingCart, DollarSign, MapPin, Users, Award, CheckCircle } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/Header';
-import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface OffsetProject {
   id: number;
@@ -130,67 +129,8 @@ function ProjectCard({ project, onPurchase }: ProjectCardProps) {
 }
 
 export default function CarbonOffsetsPage() {
-  // const [cart, setCart] = useState<Array<{ project: OffsetProject; amount: number }>>([]);
-
-  // Mock data - in real app, this would come from carbon offset marketplace API
-  const projects: OffsetProject[] = [
-    {
-      id: 1,
-      name: 'Amazon Rainforest Protection',
-      description: 'Protecting 10,000 hectares of rainforest in Brazil through sustainable land management and community development.',
-      location: 'Brazil',
-      category: 'Forestry',
-      pricePerTon: 25,
-      availableCredits: 5000,
-      totalCredits: 10000,
-      rating: 5,
-      image: '/api/placeholder/400/200',
-      certification: 'Verified Carbon Standard',
-      impact: 'Prevents deforestation, supports biodiversity, creates jobs for local communities'
-    },
-    {
-      id: 2,
-      name: 'Wind Farm Development',
-      description: 'Large-scale wind energy project replacing coal-fired power generation in rural communities.',
-      location: 'Texas, USA',
-      category: 'Renewable Energy',
-      pricePerTon: 18,
-      availableCredits: 2500,
-      totalCredits: 5000,
-      rating: 4,
-      image: '/api/placeholder/400/200',
-      certification: 'Gold Standard',
-      impact: 'Reduces fossil fuel emissions, creates green jobs, improves air quality'
-    },
-    {
-      id: 3,
-      name: 'Methane Capture Project',
-      description: 'Capturing and destroying methane emissions from landfill sites to prevent potent greenhouse gas release.',
-      location: 'California, USA',
-      category: 'Waste Management',
-      pricePerTon: 15,
-      availableCredits: 1200,
-      totalCredits: 2000,
-      rating: 4,
-      image: '/api/placeholder/400/200',
-      certification: 'Verified Carbon Standard',
-      impact: 'Reduces methane emissions (25x more potent than CO₂), improves local air quality'
-    },
-    {
-      id: 4,
-      name: 'Solar Panel Installation',
-      description: 'Community solar projects providing clean energy access to underserved rural areas.',
-      location: 'Kenya',
-      category: 'Renewable Energy',
-      pricePerTon: 22,
-      availableCredits: 800,
-      totalCredits: 1500,
-      rating: 5,
-      image: '/api/placeholder/400/200',
-      certification: 'Gold Standard',
-      impact: 'Provides clean energy access, reduces reliance on diesel generators, supports education'
-    }
-  ];
+  // TODO: Replace with API call to fetch carbon offset projects
+  const projects: OffsetProject[] = [];
 
   const handlePurchase = (project: OffsetProject, amount: number) => {
     // In real app, this would integrate with payment processor
@@ -235,7 +175,7 @@ export default function CarbonOffsetsPage() {
             <div className="flex items-center gap-3">
               <DollarSign className="w-6 h-6 text-green-400" />
               <div>
-                <div className="text-2xl font-bold text-white">$15-25</div>
+                <div className="text-2xl font-bold text-white">$0-0</div>
                 <div className="text-sm text-gray-400">Price per ton CO₂</div>
               </div>
             </div>
@@ -245,7 +185,7 @@ export default function CarbonOffsetsPage() {
             <div className="flex items-center gap-3">
               <Users className="w-6 h-6 text-blue-400" />
               <div>
-                <div className="text-2xl font-bold text-white">50K+</div>
+                <div className="text-2xl font-bold text-white">0</div>
                 <div className="text-sm text-gray-400">Projects Available</div>
               </div>
             </div>
@@ -255,7 +195,7 @@ export default function CarbonOffsetsPage() {
             <div className="flex items-center gap-3">
               <CheckCircle className="w-6 h-6 text-emerald-400" />
               <div>
-                <div className="text-2xl font-bold text-white">100%</div>
+                <div className="text-2xl font-bold text-white">0%</div>
                 <div className="text-sm text-gray-400">Verified Projects</div>
               </div>
             </div>
@@ -263,15 +203,23 @@ export default function CarbonOffsetsPage() {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {projects.map(project => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onPurchase={handlePurchase}
-            />
-          ))}
-        </div>
+        {projects.length === 0 ? (
+          <div className="text-center py-12">
+            <Leaf className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-400 mb-2">No Projects Available</h3>
+            <p className="text-gray-500">Carbon offset projects will be available soon.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            {projects.map(project => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onPurchase={handlePurchase}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Info Section */}
         <div className="mt-12 bg-gray-800/40 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6">

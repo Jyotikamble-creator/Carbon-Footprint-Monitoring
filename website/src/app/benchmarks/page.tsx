@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { BarChart3, TrendingUp, TrendingDown, Award, Users, Building, Target, Calendar, Filter, Download } from 'lucide-react';
+import { BarChart3, TrendingUp, TrendingDown, Award, Users, Building, Target, Calendar } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/Header';
-import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface BenchmarkData {
   industry: string;
@@ -221,23 +220,15 @@ export default function BenchmarksPage() {
   const [grain, setGrain] = useState<'month' | 'quarter'>('month');
   const [showComparison, setShowComparison] = useState(false);
 
-  // Mock data - in real app, this would come from benchmark API
+  // TODO: Replace with API call to fetch benchmark data
   const benchmarkData: BenchmarkData = {
     industry: selectedIndustry,
-    companyEmission: 12500,
-    industryAverage: 18750,
-    industryBest: 6250,
-    percentile: 35,
-    trend: 'improving',
-    peers: [
-      { name: 'TechCorp Inc.', emission: 6250, isCurrentCompany: false },
-      { name: 'DataSys Ltd.', emission: 8750, isCurrentCompany: false },
-      { name: 'CloudTech Solutions', emission: 11250, isCurrentCompany: false },
-      { name: 'Your Company', emission: 12500, isCurrentCompany: true },
-      { name: 'InnovateLabs', emission: 15000, isCurrentCompany: false },
-      { name: 'FutureTech Corp.', emission: 18750, isCurrentCompany: false },
-      { name: 'MegaTech Industries', emission: 25000, isCurrentCompany: false }
-    ]
+    companyEmission: 0,
+    industryAverage: 0,
+    industryBest: 0,
+    percentile: 0,
+    trend: 'stable',
+    peers: []
   };
 
   const industries = [
@@ -318,87 +309,99 @@ export default function BenchmarksPage() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <MetricCard
-            title="Your Emissions"
-            value={`${benchmarkData.companyEmission.toLocaleString()} tCO₂e`}
-            subtitle="Total annual emissions"
-            icon={<Building className="w-6 h-6" />}
-            color="blue"
-          />
-          <MetricCard
-            title="Industry Average"
-            value={`${benchmarkData.industryAverage.toLocaleString()} tCO₂e`}
-            subtitle="Sector-wide average"
-            icon={<Users className="w-6 h-6" />}
-            color="blue"
-          />
-          <MetricCard
-            title="Industry Best"
-            value={`${benchmarkData.industryBest.toLocaleString()} tCO₂e`}
-            subtitle="Top performer in sector"
-            icon={<Award className="w-6 h-6" />}
-            color="green"
-          />
-          <MetricCard
-            title="Your Ranking"
-            value={`${benchmarkData.percentile}th percentile`}
-            subtitle={`vs ${benchmarkData.peers.length} peers`}
-            icon={<Target className="w-6 h-6" />}
-            trend={benchmarkData.trend === 'improving' ? 'up' : benchmarkData.trend === 'declining' ? 'down' : 'neutral'}
-            color={benchmarkData.percentile > 75 ? 'green' : benchmarkData.percentile > 50 ? 'yellow' : 'red'}
-          />
-        </div>
+        {benchmarkData.peers.length === 0 ? (
+          <div className="text-center py-12 mb-8">
+            <BarChart3 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-400 mb-2">No Benchmark Data Available</h3>
+            <p className="text-gray-500">Industry benchmark data will be available soon.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <MetricCard
+              title="Your Emissions"
+              value={`${benchmarkData.companyEmission.toLocaleString()} tCO₂e`}
+              subtitle="Total annual emissions"
+              icon={<Building className="w-6 h-6" />}
+              color="blue"
+            />
+            <MetricCard
+              title="Industry Average"
+              value={`${benchmarkData.industryAverage.toLocaleString()} tCO₂e`}
+              subtitle="Sector-wide average"
+              icon={<Users className="w-6 h-6" />}
+              color="blue"
+            />
+            <MetricCard
+              title="Industry Best"
+              value={`${benchmarkData.industryBest.toLocaleString()} tCO₂e`}
+              subtitle="Top performer in sector"
+              icon={<Award className="w-6 h-6" />}
+              color="green"
+            />
+            <MetricCard
+              title="Your Ranking"
+              value={`${benchmarkData.percentile}th percentile`}
+              subtitle={`vs ${benchmarkData.peers.length} peers`}
+              icon={<Target className="w-6 h-6" />}
+              trend={benchmarkData.trend === 'improving' ? 'up' : benchmarkData.trend === 'declining' ? 'down' : 'neutral'}
+              color={benchmarkData.percentile > 75 ? 'green' : benchmarkData.percentile > 50 ? 'yellow' : 'red'}
+            />
+          </div>
+        )}
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <BenchmarkChart data={benchmarkData} />
-          <PeerComparison peers={benchmarkData.peers} />
-        </div>
+        {benchmarkData.peers.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <BenchmarkChart data={benchmarkData} />
+            <PeerComparison peers={benchmarkData.peers} />
+          </div>
+        )}
 
         {/* Recommendations */}
-        <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Improvement Recommendations</h3>
+        {benchmarkData.peers.length > 0 && (
+          <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Improvement Recommendations</h3>
 
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 p-4 bg-emerald-900/20 border border-emerald-700/50 rounded-lg">
-              <div className="w-6 h-6 bg-emerald-500/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-emerald-400 text-sm">💡</span>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 p-4 bg-emerald-900/20 border border-emerald-700/50 rounded-lg">
+                <div className="w-6 h-6 bg-emerald-500/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-emerald-400 text-sm">💡</span>
+                </div>
+                <div>
+                  <h4 className="text-emerald-400 font-medium mb-1">Implement Renewable Energy</h4>
+                  <p className="text-emerald-300 text-sm">
+                    Transition to renewable energy sources could reduce your emissions by up to 40%.
+                    Top performers in your industry have achieved this through solar and wind power procurement.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-emerald-400 font-medium mb-1">Implement Renewable Energy</h4>
-                <p className="text-emerald-300 text-sm">
-                  Transition to renewable energy sources could reduce your emissions by up to 40%.
-                  Top performers in your industry have achieved this through solar and wind power procurement.
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-start gap-3 p-4 bg-blue-900/20 border border-blue-700/50 rounded-lg">
-              <div className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-blue-400 text-sm">🎯</span>
+              <div className="flex items-start gap-3 p-4 bg-blue-900/20 border border-blue-700/50 rounded-lg">
+                <div className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-blue-400 text-sm">🎯</span>
+                </div>
+                <div>
+                  <h4 className="text-blue-400 font-medium mb-1">Optimize Supply Chain</h4>
+                  <p className="text-blue-300 text-sm">
+                    Work with suppliers to reduce Scope 3 emissions. Industry leaders have reduced supply chain emissions by 25% through vendor assessments and collaboration.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-blue-400 font-medium mb-1">Optimize Supply Chain</h4>
-                <p className="text-blue-300 text-sm">
-                  Work with suppliers to reduce Scope 3 emissions. Industry leaders have reduced supply chain emissions by 25% through vendor assessments and collaboration.
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-start gap-3 p-4 bg-purple-900/20 border border-purple-700/50 rounded-lg">
-              <div className="w-6 h-6 bg-purple-500/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-purple-400 text-sm">📊</span>
-              </div>
-              <div>
-                <h4 className="text-purple-400 font-medium mb-1">Enhance Monitoring</h4>
-                <p className="text-purple-300 text-sm">
-                  Implement real-time monitoring and automated reporting to identify emission reduction opportunities. Leading companies use AI-driven analytics for continuous improvement.
-                </p>
+              <div className="flex items-start gap-3 p-4 bg-purple-900/20 border border-purple-700/50 rounded-lg">
+                <div className="w-6 h-6 bg-purple-500/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-purple-400 text-sm">📊</span>
+                </div>
+                <div>
+                  <h4 className="text-purple-400 font-medium mb-1">Enhance Monitoring</h4>
+                  <p className="text-purple-300 text-sm">
+                    Implement real-time monitoring and automated reporting to identify emission reduction opportunities. Leading companies use AI-driven analytics for continuous improvement.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

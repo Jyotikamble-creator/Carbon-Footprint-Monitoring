@@ -91,58 +91,16 @@ function GoalProgress({ goal }: GoalProgressProps) {
 }
 
 export default function GoalsPage() {
-  // const [showCreateForm, setShowCreateForm] = useState(false);
-
-  // Mock data - in real app, this would come from API
-  const goals: Goal[] = [
-    {
-      id: 1,
-      title: 'Reduce Scope 1 Emissions by 20%',
-      description: 'Decrease direct emissions from owned sources',
-      target_value: 1000,
-      current_value: 750,
-      unit: 'tCO2e',
-      start_date: '2024-01-01',
-      end_date: '2024-12-31',
-      status: 'active',
-      category: 'Emissions Reduction'
-    },
-    {
-      id: 2,
-      title: 'Achieve Carbon Neutrality',
-      description: 'Offset all remaining emissions through carbon credits',
-      target_value: 500,
-      current_value: 500,
-      unit: 'tCO2e',
-      start_date: '2024-01-01',
-      end_date: '2024-12-31',
-      status: 'completed',
-      category: 'Carbon Neutrality'
-    },
-    {
-      id: 3,
-      title: 'Implement Renewable Energy',
-      description: 'Transition 30% of energy consumption to renewables',
-      target_value: 30,
-      current_value: 15,
-      unit: '%',
-      start_date: '2024-01-01',
-      end_date: '2025-12-31',
-      status: 'active',
-      category: 'Renewable Energy'
-    }
-  ];
-
+  // TODO: Replace with API call to fetch goals data
+  const goals: Goal[] = [];
   const activeGoals = goals.filter(g => g.status === 'active');
   const completedGoals = goals.filter(g => g.status === 'completed');
   const overdueGoals = goals.filter(g => g.status === 'overdue');
 
   return (
-    <div>
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
       <DashboardHeader />
-      <div className="flex min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-        
-        <main className="flex-1 p-8">
+      <div className="container mx-auto px-6 py-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
           <div>
@@ -197,7 +155,9 @@ export default function GoalsPage() {
             <div className="flex items-center gap-3">
               <TrendingUp className="w-6 h-6 text-emerald-400" />
               <div>
-                <div className="text-2xl font-bold text-white">75%</div>
+                <div className="text-2xl font-bold text-white">
+                  {goals.length > 0 ? Math.round((completedGoals.length / goals.length) * 100) : 0}%
+                </div>
                 <div className="text-sm text-gray-400">Avg Progress</div>
               </div>
             </div>
@@ -206,40 +166,49 @@ export default function GoalsPage() {
 
         {/* Goals List */}
         <div className="space-y-6">
-          {activeGoals.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-4">Active Goals</h2>
-              <div className="space-y-4">
-                {activeGoals.map(goal => (
-                  <GoalProgress key={goal.id} goal={goal} />
-                ))}
-              </div>
+          {goals.length === 0 ? (
+            <div className="text-center py-12">
+              <Target className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-400 mb-2">No Goals Yet</h3>
+              <p className="text-gray-500">Create your first carbon reduction goal to get started.</p>
             </div>
-          )}
+          ) : (
+            <>
+              {activeGoals.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold text-white mb-4">Active Goals</h2>
+                  <div className="space-y-4">
+                    {activeGoals.map(goal => (
+                      <GoalProgress key={goal.id} goal={goal} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          {completedGoals.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-4">Completed Goals</h2>
-              <div className="space-y-4">
-                {completedGoals.map(goal => (
-                  <GoalProgress key={goal.id} goal={goal} />
-                ))}
-              </div>
-            </div>
-          )}
+              {completedGoals.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold text-white mb-4">Completed Goals</h2>
+                  <div className="space-y-4">
+                    {completedGoals.map(goal => (
+                      <GoalProgress key={goal.id} goal={goal} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          {overdueGoals.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-4">Overdue Goals</h2>
-              <div className="space-y-4">
-                {overdueGoals.map(goal => (
-                  <GoalProgress key={goal.id} goal={goal} />
-                ))}
-              </div>
-            </div>
+              {overdueGoals.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold text-white mb-4">Overdue Goals</h2>
+                  <div className="space-y-4">
+                    {overdueGoals.map(goal => (
+                      <GoalProgress key={goal.id} goal={goal} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
-        </main>
       </div>
     </div>
   );
