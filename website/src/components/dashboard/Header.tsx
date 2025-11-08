@@ -26,6 +26,10 @@ export default function DashboardHeader() {
     if (path === '/ingest') return 'Ingest';
     if (path === '/analytics') return 'Analytics';
     if (path === '/reports') return 'Reports';
+    if (path === '/goals') return 'Goals';
+    if (path === '/offsets') return 'Offsets';
+    if (path === '/benchmarks') return 'Benchmarks';
+    if (path === '/collaborate') return 'Collaborate';
     return 'Dashboard'; // default fallback
   };
 
@@ -41,12 +45,12 @@ export default function DashboardHeader() {
   
   // Add tabs based on user role
   if (user?.role === 'admin') {
-    tabs.push('Facilities', 'Users', 'Factors', 'Ingest', 'Analytics', 'Reports');
+    tabs.push('Facilities', 'Users', 'Factors', 'Ingest', 'Analytics', 'Reports', 'Goals', 'Offsets', 'Benchmarks', 'Collaborate');
   } else if (user?.role === 'analyst') {
-    tabs.push('Facilities', 'Factors', 'Ingest', 'Analytics', 'Reports');
+    tabs.push('Facilities', 'Factors', 'Ingest', 'Analytics', 'Reports', 'Goals', 'Offsets', 'Benchmarks', 'Collaborate');
   } else {
     // Viewer role
-    tabs.push('Analytics', 'Reports');
+    tabs.push('Analytics', 'Reports', 'Goals', 'Offsets', 'Benchmarks', 'Collaborate');
   }
 
   const handleTabClick = (tab: string) => {

@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/axios/apiClient";
 import { categorizeAxiosError } from "@/lib/errors";
-import type { KpisResponse, TrendPoint, SummaryResponse } from "@/types/analytics/analyticstypes";
+import type { KpisResponse, TrendPoint, SummaryResponse, SuggestionResponse } from "@/types/analytics/analyticstypes";
 
 // In-flight request dedupe map. Keyed by request URL (including query params).
 const inflightRequests = new Map<string, Promise<unknown>>();
@@ -64,10 +64,10 @@ export type SuggestionsResponse = {
   message: string;
 };
 
-export async function getSuggestions(): Promise<SuggestionsResponse> {
+export async function getSuggestions(): Promise<SuggestionResponse> {
   try {
     const url = `/v1/analytics/suggestions`;
-    return await fetchWithDedupe<SuggestionsResponse>(url);
+    return await fetchWithDedupe<SuggestionResponse>(url);
   } catch (err) {
     throw categorizeAxiosError(err);
   }

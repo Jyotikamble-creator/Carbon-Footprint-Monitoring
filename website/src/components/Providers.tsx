@@ -6,6 +6,7 @@ import { store } from "@/lib/store";
 import { fetchCurrentUser, setToken } from "@/lib/auth/authSlice";
 import { setAuthToken } from "@/lib/axios/apiClient";
 import { ThemeProvider } from "@/lib/theme/ThemeContext";
+import { NotificationProvider } from "./NotificationCenter";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +35,11 @@ export default function Providers({ children }: Props) {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <NotificationProvider>
+            {children}
+          </NotificationProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </Provider>
   );

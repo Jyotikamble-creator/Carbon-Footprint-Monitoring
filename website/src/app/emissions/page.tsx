@@ -17,7 +17,9 @@ import {
   Calculator,
   Activity,
   TrendingUp,
-  Building
+  Building,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 
 export default function EmissionsPage() {
@@ -42,6 +44,19 @@ export default function EmissionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 50;
+
+  // Sorting
+  const [sortField, setSortField] = useState<string>('occurred_at');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
 
   // UI state
   const [showFilters, setShowFilters] = useState(false);
@@ -111,6 +126,19 @@ export default function EmissionsPage() {
     const matchesScope = !filters.scope || item.scope === filters.scope;
 
     return matchesSearch && matchesCategory && matchesScope;
+  }).sort((a, b) => {
+    let aValue: any = a[sortField as keyof typeof a];
+    let bValue: any = b[sortField as keyof typeof b];
+
+    // Handle date sorting
+    if (sortField === 'occurred_at') {
+      aValue = new Date(aValue).getTime();
+      bValue = new Date(bValue).getTime();
+    }
+
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
   });
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -351,17 +379,57 @@ export default function EmissionsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-700/50 bg-gray-800/50">
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Date & Time
+                      <th
+                        className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('occurred_at')}
+                      >
+                        <div className="flex items-center gap-2">
+                          Date & Time
+                          {sortField === 'occurred_at' && (
+                            sortDirection === 'asc' ?
+                              <ChevronUp className="w-4 h-4" /> :
+                              <ChevronDown className="w-4 h-4" />
+                          )}
+                        </div>
                       </th>
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Category
+                      <th
+                        className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('category')}
+                      >
+                        <div className="flex items-center gap-2">
+                          Category
+                          {sortField === 'category' && (
+                            sortDirection === 'asc' ?
+                              <ChevronUp className="w-4 h-4" /> :
+                              <ChevronDown className="w-4 h-4" />
+                          )}
+                        </div>
                       </th>
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Scope
+                      <th
+                        className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('scope')}
+                      >
+                        <div className="flex items-center gap-2">
+                          Scope
+                          {sortField === 'scope' && (
+                            sortDirection === 'asc' ?
+                              <ChevronUp className="w-4 h-4" /> :
+                              <ChevronDown className="w-4 h-4" />
+                          )}
+                        </div>
                       </th>
-                      <th className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        CO₂e
+                      <th
+                        className="text-right py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('co2e_kg')}
+                      >
+                        <div className="flex items-center justify-end gap-2">
+                          CO₂e
+                          {sortField === 'co2e_kg' && (
+                            sortDirection === 'asc' ?
+                              <ChevronUp className="w-4 h-4" /> :
+                              <ChevronDown className="w-4 h-4" />
+                          )}
+                        </div>
                       </th>
                       <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Event ID
