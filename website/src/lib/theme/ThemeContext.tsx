@@ -13,27 +13,49 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Initialize theme from localStorage and system preference
   const getInitialTheme = () => {
     if (typeof window === 'undefined') return true; // Default to dark on server
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return savedTheme ? savedTheme === 'dark' : prefersDark;
+    try {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return savedTheme ? savedTheme === 'dark' : prefersDark;
+    } catch {
+      return true; // Default to dark if localStorage fails
+    }
   };
 
-  const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
+  const [isDarkMode, setIsDarkMode] = useState(true); // Start with dark theme
 
   // Apply theme to document when component mounts or theme changes
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const root = document.documentElement;
-    if (isDarkMode) {
+    const newDarkMode = getInitialTheme();
+    setIsDarkMode(newDarkMode);
+
+    if (newDarkMode) {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
-  }, [isDarkMode]);
+  }, []);
 
   const toggleTheme = () => {
+    if (typeof window === 'undefined') return;
+
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
-    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
+    try {
+      localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
+    } catch {
+      // Ignore localStorage errors
+    }
+
+    const root = document.documentElement;
+    if (newDarkMode) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
   };
 
   return (

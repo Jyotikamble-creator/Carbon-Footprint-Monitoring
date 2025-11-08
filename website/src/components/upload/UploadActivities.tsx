@@ -5,6 +5,8 @@ import FileDropzone from '@/components/upload/FileDropzone';
 import AlternativeStates from '@/components/upload/AlternativeStates';
 import { uploadCsv } from '@/lib/ingest/api';
 import type { IngestResponse } from '@/types/ingest/ingesttypes';
+import { FileText } from 'lucide-react';
+import { useNotifications } from '@/components/NotificationCenter';
 
 export default function UploadActivityContent() {
   const [uploadState, setUploadState] = useState<'idle' | 'ready' | 'uploading' | 'complete' | 'error'>('idle');
@@ -12,6 +14,7 @@ export default function UploadActivityContent() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadResult, setUploadResult] = useState<IngestResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { addNotification } = useNotifications();
 
   const handleFileSelect = (selectedFile: File) => {
     setFile(selectedFile);
@@ -53,12 +56,26 @@ export default function UploadActivityContent() {
       setUploadProgress(100);
       setUploadResult(result);
       setUploadState('complete');
+
+      // Send success notification
+      addNotification({
+        type: 'success',
+        title: 'Data Upload Complete',
+        message: `Successfully processed ${result.created_events} events and calculated ${result.created_emissions} emissions.`,
+      });
       
     } catch (err) {
       console.error('Upload failed:', err);
       setError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
       setUploadState('error');
       setUploadProgress(0);
+
+      // Send error notification
+      addNotification({
+        type: 'error',
+        title: 'Upload Failed',
+        message: err instanceof Error ? err.message : 'Upload failed. Please check your file and try again.',
+      });
     }
   };
 
@@ -98,6 +115,41 @@ export default function UploadActivityContent() {
           <p className="text-gray-300 text-sm">{error}</p>
         </div>
       )}
+
+      {/* Template Download Section */}
+      <div className="bg-blue-900/30 border border-blue-700/50 rounded-xl p-6 mb-6">
+        <h3 className="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+          <FileText className="w-5 h-5" />
+          Need a Template?
+        </h3>
+        <p className="text-blue-400 text-sm mb-4">
+          Download our CSV template to ensure your data is formatted correctly for upload.
+        </p>
+        <button
+          onClick={() => {
+            // Create a sample CSV template
+            const csvContent = `facility_name,activity_type,category,value,unit,date
+Headquarters,Electricity,Electricity,15000,kWh,2024-01-15
+Branch Office,Natural Gas,Natural Gas,5000,therms,2024-01-15
+Warehouse,Diesel,Diesel,2000,gallons,2024-01-15
+Office,Air Travel,Air Travel,5000,miles,2024-01-15`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'emissions_template.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+        >
+          <FileText className="w-4 h-4" />
+          Download CSV Template
+        </button>
+      </div>
 
       {/* Main Upload Section */}
       {uploadState === 'idle' && (

@@ -36,10 +36,15 @@ export default function FileDropzone({ onFileSelect }: FileDropzoneProps) {
 		const files = e.dataTransfer.files;
 		if (files && files.length > 0) {
 			const file = files[0];
+			// Validate file type and size
 			if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+				if (file.size > 10 * 1024 * 1024) { // 10MB limit
+					alert('File size exceeds 10MB limit. Please choose a smaller file.');
+					return;
+				}
 				onFileSelect(file);
 			} else {
-				alert('Please upload a CSV file');
+				alert('Please upload a CSV file only. Other file types are not supported.');
 			}
 		}
 	};

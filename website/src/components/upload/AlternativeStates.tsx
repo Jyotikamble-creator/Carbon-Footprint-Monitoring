@@ -61,18 +61,38 @@ export default function AlternativeStates({
 			{/* Uploading */}
 			{state === 'uploading' && (
 				<div className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
-					<h3 className="text-white font-semibold mb-4">Uploading...</h3>
-          
-					<div className="mb-2">
-						<div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+					<h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+						<div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+						Uploading File...
+					</h3>
+
+					<div className="mb-4">
+						<div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
 							<div
-								className="h-full bg-emerald-500 transition-all duration-300 ease-out"
+								className="h-full bg-linear-to-r from-emerald-500 to-emerald-400 transition-all duration-300 ease-out rounded-full"
 								style={{ width: `${progress}%` }}
 							/>
 						</div>
 					</div>
-          
-					<p className="text-sm text-gray-400 text-center">{progress}% complete</p>
+
+					<div className="flex justify-between items-center text-sm">
+						<span className="text-gray-400">{progress}% complete</span>
+						<span className="text-emerald-400 font-medium">
+							{progress < 30 ? 'Validating file...' :
+							 progress < 70 ? 'Processing data...' :
+							 progress < 90 ? 'Calculating emissions...' : 'Finalizing upload...'}
+						</span>
+					</div>
+
+					{file && (
+						<div className="mt-4 p-3 bg-gray-900/50 rounded-lg">
+							<div className="flex items-center gap-2 text-sm text-gray-300">
+								<FileText className="w-4 h-4 text-emerald-400" />
+								<span>Uploading: {file.name}</span>
+								<span className="text-gray-500">({formatFileSize(file.size)})</span>
+							</div>
+						</div>
+					)}
 				</div>
 			)}
 

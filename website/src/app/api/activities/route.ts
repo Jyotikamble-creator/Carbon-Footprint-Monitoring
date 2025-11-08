@@ -8,8 +8,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     const params: GetActivitiesParams = {
-      page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : undefined,
-      page_size: searchParams.get('page_size') ? parseInt(searchParams.get('page_size')!) : undefined,
+      limit: searchParams.get('page_size') ? parseInt(searchParams.get('page_size')!) : undefined,
+      offset: searchParams.get('page') ? (parseInt(searchParams.get('page')!) - 1) * (searchParams.get('page_size') ? parseInt(searchParams.get('page_size')!) : 50) : undefined,
       facility_id: searchParams.get('facility_id') ? parseInt(searchParams.get('facility_id')!) : undefined,
       category: searchParams.get('category') || undefined,
     };

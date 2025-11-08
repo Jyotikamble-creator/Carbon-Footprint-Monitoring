@@ -4,6 +4,7 @@ import { getActivities } from "@/lib/activities/api";
 import { fetchFacilities } from "@/lib/tenants/api";
 import DashboardHeader from '@/components/dashboard/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Link from 'next/link';
 import type { Activity } from "@/types/activities/activitytypes";
 import type { Facility } from "@/types/tenants/tenantstypes";
 import {
@@ -19,7 +20,12 @@ import {
   Hash,
   Plus
 } from 'lucide-react';
-import Link from 'next/link';
+import AdvancedSearch, { FilterOption, SavedFilter } from '@/components/advanced/AdvancedSearch';
+import { useSavedFilters } from '@/hooks/useSavedFilters';
+import { ExportButton } from '@/components/advanced/ExportButton';
+import { ExportColumn } from '@/lib/export';
+import { BulkOperations } from '@/components/advanced/BulkOperations';
+import { useBulkSelection } from '@/hooks/useBulkSelection';
 
 export default function ActivitiesPage() {
   const [items, setItems] = useState<Activity[]>([]);
@@ -27,19 +33,17 @@ export default function ActivitiesPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters
-  const [filters, setFilters] = useState({
-    from: '',
-    to: '',
-    category: '',
-    facility_id: ''
-  });
+  // Advanced search and filtering
+    const { savedFilters, saveFilter, loadFilter: loadSavedFilter, deleteFilter } = useSavedFilters('activities');
 
-  // Search and pagination
+  const handleLoadFilter = (filter: SavedFilter) => {
+    // Load the filter using the hook
+    const loadedFilter = loadSavedFilter(filter as any);
+    // Apply the filters to the component state
+    setAdvancedFilters(loadedFilter.filters);
+  };
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 50;
+  const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
 
   // UI state
   const [showFilters, setShowFilters] = useState(false);
@@ -60,6 +64,115 @@ export default function ActivitiesPage() {
     'Propane'
   ];
 
+  // Filter options for advanced search
+  const filterOptions: FilterOption[] = [
+    {
+      key: 'from',
+      label: 'From Date',
+      type: 'date'
+    },
+    {
+      key: 'to',
+      label: 'To Date',
+      type: 'date'
+    },
+    {
+      key: 'category',
+      label: 'Category',
+      type: 'select',
+      options: categories.map(cat => ({ value: cat, label: cat }))
+    },
+    {
+      key: 'facility_id',
+      label: 'Facility',
+      type: 'select',
+      options: facilities.map(facility => ({ value: facility.id.toString(), label: facility.name }))
+    },
+    {
+      key: 'value_numeric_min',
+      label: 'Min Value',
+      type: 'number',
+      placeholder: 'Minimum value'
+    },
+    {
+      key: 'value_numeric_max',
+      label: 'Max Value',
+      type: 'number',
+      placeholder: 'Maximum value'
+    },
+    {
+      key: 'unit',
+      label: 'Unit',
+      type: 'text',
+      placeholder: 'e.g., kWh, kg'
+    }
+  ];
+
+  // Export columns configuration
+  const exportColumns: ExportColumn[] = [
+    {
+      key: 'id',
+      label: 'ID'
+    },
+    {
+      key: 'occurred_at',
+      label: 'Date & Time',
+      format: (value) => new Date(value).toLocaleString()
+    },
+    {
+      key: 'category',
+      label: 'Category'
+    },
+    {
+      key: 'subcategory',
+      label: 'Subcategory'
+    },
+    {
+      key: 'value_numeric',
+      label: 'Value'
+    },
+    {
+      key: 'unit',
+      label: 'Unit'
+    },
+    {
+      key: 'facility_id',
+      label: 'Facility ID'
+    },
+    {
+      key: 'source_id',
+      label: 'Source'
+    }
+  ];
+
+  // Bulk operations
+  const {
+    selectedItems,
+    toggleSelection,
+    selectAll,
+    clearSelection,
+    isSelected,
+    setSelectedItems
+  } = useBulkSelection<Activity>();
+
+  const handleBulkDelete = async (items: Activity[]) => {
+    // Implement bulk delete logic here
+    console.log('Bulk delete items:', items);
+    // For now, just show a message
+    alert(`Bulk delete not implemented yet. Would delete ${items.length} items.`);
+  };
+
+  const handleBulkEdit = (items: Activity[]) => {
+    // Implement bulk edit logic here
+    console.log('Bulk edit items:', items);
+    // For now, just show a message
+    alert(`Bulk edit not implemented yet. Would edit ${items.length} items.`);
+  };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 50;
+
   async function loadFacilities() {
     try {
       const res = await fetchFacilities();
@@ -78,10 +191,13 @@ export default function ActivitiesPage() {
         offset: (currentPage - 1) * itemsPerPage
       };
 
-      if (filters.from) params.from = filters.from;
-      if (filters.to) params.to = filters.to;
-      if (filters.category) params.category = filters.category;
-      if (filters.facility_id) params.facility_id = parseInt(filters.facility_id);
+      if (advancedFilters.from) params.from = advancedFilters.from;
+      if (advancedFilters.to) params.to = advancedFilters.to;
+      if (advancedFilters.category) params.category = advancedFilters.category;
+      if (advancedFilters.facility_id) params.facility_id = parseInt(advancedFilters.facility_id);
+      if (advancedFilters.value_numeric_min) params.value_min = advancedFilters.value_numeric_min;
+      if (advancedFilters.value_numeric_max) params.value_max = advancedFilters.value_numeric_max;
+      if (advancedFilters.unit) params.unit = advancedFilters.unit;
 
       const res = await getActivities(params);
       setItems(res);
@@ -101,21 +217,19 @@ export default function ActivitiesPage() {
       item.source_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       facilities.find(f => f.id === item.facility_id)?.name.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory = !filters.category || item.category.includes(filters.category);
-    const matchesFacility = !filters.facility_id || item.facility_id?.toString() === filters.facility_id;
+    const matchesCategory = !advancedFilters.category || item.category.includes(advancedFilters.category);
+    const matchesFacility = !advancedFilters.facility_id || item.facility_id?.toString() === advancedFilters.facility_id;
+    const matchesMinValue = !advancedFilters.value_numeric_min || item.value_numeric >= advancedFilters.value_numeric_min;
+    const matchesMaxValue = !advancedFilters.value_numeric_max || item.value_numeric <= advancedFilters.value_numeric_max;
+    const matchesUnit = !advancedFilters.unit || item.unit.toLowerCase().includes(advancedFilters.unit.toLowerCase());
 
-    return matchesSearch && matchesCategory && matchesFacility;
+    return matchesSearch && matchesCategory && matchesFacility && matchesMinValue && matchesMaxValue && matchesUnit;
   });
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setCurrentPage(1); // Reset to first page when filters change
-  };
-
   const clearFilters = () => {
-    setFilters({ from: '', to: '', category: '', facility_id: '' });
+    setAdvancedFilters({});
     setSearchQuery('');
     setCurrentPage(1);
   };
@@ -126,7 +240,7 @@ export default function ActivitiesPage() {
 
   useEffect(() => {
     loadActivities();
-  }, [filters, currentPage]);
+  }, [advancedFilters, currentPage]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -172,13 +286,11 @@ export default function ActivitiesPage() {
                   <Plus className="w-4 h-4" />
                   Add Activity
                 </Link>
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-800/60 border border-gray-700 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"
-                >
-                  <Filter className="w-4 h-4" />
-                  Filters
-                </button>
+                <ExportButton
+                  data={filteredItems}
+                  columns={exportColumns}
+                  filename={`activities_${new Date().toISOString().split('T')[0]}`}
+                />
                 <button
                   onClick={loadActivities}
                   disabled={loading}
@@ -190,98 +302,16 @@ export default function ActivitiesPage() {
               </div>
             </div>
 
-            {/* Filters Panel */}
-            {showFilters && (
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-                  {/* Date From */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      From Date
-                    </label>
-                    <input
-                      type="date"
-                      value={filters.from}
-                      onChange={(e) => handleFilterChange('from', e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  {/* Date To */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      To Date
-                    </label>
-                    <input
-                      type="date"
-                      value={filters.to}
-                      onChange={(e) => handleFilterChange('to', e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  {/* Category */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Category
-                    </label>
-                    <select
-                      value={filters.category}
-                      onChange={(e) => handleFilterChange('category', e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      <option value="">All Categories</option>
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Facility */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Facility
-                    </label>
-                    <select
-                      value={filters.facility_id}
-                      onChange={(e) => handleFilterChange('facility_id', e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      <option value="">All Facilities</option>
-                      {facilities.map(facility => (
-                        <option key={facility.id} value={facility.id}>{facility.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Search */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Search
-                    </label>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search activities..."
-                        className="w-full pl-10 pr-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={clearFilters}
-                    className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
-              </div>
-            )}
+            <AdvancedSearch
+              filters={filterOptions}
+              onFiltersChange={setAdvancedFilters}
+              onSearch={setSearchQuery}
+              searchPlaceholder="Search activities by category, unit, facility..."
+              savedFilters={savedFilters}
+              onSaveFilter={saveFilter}
+              onLoadFilter={handleLoadFilter}
+              onDeleteFilter={deleteFilter}
+            />
 
             {/* Results Summary */}
             <div className="flex items-center justify-between mb-6">
@@ -302,110 +332,139 @@ export default function ActivitiesPage() {
             )}
 
             {/* Activities Table */}
-            <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl border border-gray-700/50 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-700/50 bg-gray-800/50">
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Date & Time
-                      </th>
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Category
-                      </th>
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Value & Unit
-                      </th>
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Facility
-                      </th>
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Source
-                      </th>
-                      <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        ID
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {loading ? (
-                      <tr>
-                        <td colSpan={6} className="py-12 text-center">
-                          <div className="flex items-center justify-center gap-3 text-gray-400">
-                            <RefreshCw className="w-6 h-6 animate-spin" />
-                            Loading activities data...
-                          </div>
-                        </td>
+            <BulkOperations
+              selectedItems={selectedItems}
+              onSelectionChange={setSelectedItems}
+              onBulkDelete={handleBulkDelete}
+              onBulkEdit={handleBulkEdit}
+            >
+              <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl border border-gray-700/50 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-700/50 bg-gray-800/50">
+                        <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                selectAll(filteredItems);
+                              } else {
+                                clearSelection();
+                              }
+                            }}
+                            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                          />
+                        </th>
+                        <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Date & Time
+                        </th>
+                        <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Category
+                        </th>
+                        <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Value & Unit
+                        </th>
+                        <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Facility
+                        </th>
+                        <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          Source
+                        </th>
+                        <th className="text-left py-4 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          ID
+                        </th>
                       </tr>
-                    ) : filteredItems.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="py-12 text-center text-gray-400">
-                          {searchQuery || Object.values(filters).some(v => v) ?
-                            "No activities found matching your filters." :
-                            "No activity data available. Start by adding some activities."}
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredItems.map((item, index) => (
-                        <tr
-                          key={item.id}
-                          className={`border-b border-gray-700/30 hover:bg-gray-800/30 transition-colors ${
-                            index === filteredItems.length - 1 ? 'border-b-0' : ''
-                          }`}
-                        >
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              <Calendar className="w-4 h-4 text-emerald-400" />
-                              <div>
-                                <div className="text-white font-medium">
-                                  {formatDate(item.occurred_at)}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-2">
-                              <ActivityIcon className="w-4 h-4 text-blue-400" />
-                              <div>
-                                <span className="text-white font-medium">{item.category}</span>
-                                {item.subcategory && (
-                                  <div className="text-gray-400 text-sm">{item.subcategory}</div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-6">
-                            <span className="text-emerald-400 font-semibold">
-                              {formatValue(item.value_numeric, item.unit)}
-                            </span>
-                            {item.currency && item.spend_value && (
-                              <div className="text-gray-400 text-sm">
-                                {item.currency} {item.spend_value.toLocaleString()}
-                              </div>
-                            )}
-                          </td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-2">
-                              <Building className="w-4 h-4 text-purple-400" />
-                              <span className="text-white">{getFacilityName(item.facility_id)}</span>
-                            </div>
-                          </td>
-                          <td className="py-4 px-6 text-gray-400">
-                            {item.source_id || 'Manual'}
-                          </td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-2">
-                              <Hash className="w-4 h-4 text-gray-400" />
-                              <span className="text-gray-400">#{item.id}</span>
+                    </thead>
+                    <tbody>
+                      {loading ? (
+                        <tr>
+                          <td colSpan={7} className="py-12 text-center">
+                            <div className="flex items-center justify-center gap-3 text-gray-400">
+                              <RefreshCw className="w-6 h-6 animate-spin" />
+                              Loading activities data...
                             </div>
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                      ) : filteredItems.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="py-12 text-center text-gray-400">
+                            {searchQuery || Object.values(advancedFilters).some(v => v) ?
+                              "No activities found matching your filters." :
+                              "No activity data available. Start by adding some activities."}
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredItems.map((item, index) => (
+                          <tr
+                            key={item.id}
+                            className={`border-b border-gray-700/30 hover:bg-gray-800/30 transition-colors ${
+                              index === filteredItems.length - 1 ? 'border-b-0' : ''
+                            }`}
+                          >
+                            <td className="py-4 px-6">
+                              <input
+                                type="checkbox"
+                                checked={isSelected(item)}
+                                onChange={() => toggleSelection(item)}
+                                className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                              />
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-3">
+                                <Calendar className="w-4 h-4 text-emerald-400" />
+                                <div>
+                                  <div className="text-white font-medium">
+                                    {formatDate(item.occurred_at)}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-2">
+                                <ActivityIcon className="w-4 h-4 text-blue-400" />
+                                <div>
+                                  <span className="text-white font-medium">{item.category}</span>
+                                  {item.subcategory && (
+                                    <div className="text-gray-400 text-sm">{item.subcategory}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-6">
+                              <span className="text-emerald-400 font-semibold">
+                                {formatValue(item.value_numeric, item.unit)}
+                              </span>
+                              {item.currency && item.spend_value && (
+                                <div className="text-gray-400 text-sm">
+                                  {item.currency} {item.spend_value.toLocaleString()}
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-2">
+                                <Building className="w-4 h-4 text-purple-400" />
+                                <span className="text-white">{getFacilityName(item.facility_id)}</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-6 text-gray-400">
+                              {item.source_id || 'Manual'}
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-2">
+                                <Hash className="w-4 h-4 text-gray-400" />
+                                <span className="text-gray-400">#{item.id}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            </BulkOperations>
 
             {/* Pagination */}
             {totalPages > 1 && (
