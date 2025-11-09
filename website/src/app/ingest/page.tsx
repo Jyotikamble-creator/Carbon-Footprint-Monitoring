@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import ProtectedRoute from '@/components/ProtectedRoute';
-import DashboardHeader from '@/components/dashboard/Header';
 import { ingestEvents, uploadCsv } from "@/lib/ingest/api";
 import type { IngestResponse } from "@/types/ingest/ingesttypes";
 import { Upload, FileText, Send, AlertCircle, CheckCircle } from 'lucide-react';
@@ -57,10 +56,8 @@ export default function IngestPage() {
 
   return (
     <ProtectedRoute>
-      <div>
-        <DashboardHeader />
-        <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900 p-8">
-          <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900 p-8">
+        <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">Data Ingestion</h1>
             <p className="text-gray-400">Upload emissions data via JSON API or CSV file</p>
@@ -191,7 +188,6 @@ export default function IngestPage() {
               )}
             </div>
           )}
-        </div>
         </div>
       </div>
     </ProtectedRoute>

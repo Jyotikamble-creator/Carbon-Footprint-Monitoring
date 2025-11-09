@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { listEmissions, recomputeEmissions } from "@/lib/emissions/api";
 import { fetchFacilities } from "@/lib/tenants/api";
-import DashboardHeader from '@/components/dashboard/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import type { Emission } from "@/types/emission/emissiontypes";
 import type { Facility } from "@/types/tenants/tenantstypes";
@@ -190,10 +189,8 @@ export default function EmissionsPage() {
 
   return (
     <ProtectedRoute>
-      <div>
-        <DashboardHeader />
-        <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-          <div className="container mx-auto px-6 py-8">
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
+        <div className="container mx-auto px-6 py-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -528,7 +525,6 @@ export default function EmissionsPage() {
             )}
           </div>
         </div>
-      </div>
     </ProtectedRoute>
   );
 }

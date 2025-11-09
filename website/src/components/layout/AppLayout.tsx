@@ -3,6 +3,7 @@
 import { useState, ReactNode } from 'react';
 import DashboardHeader from '@/components/dashboard/Header';
 import { ToastProvider } from '../ui/Toast';
+import { NotificationProvider } from '../NotificationCenter';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -16,20 +17,22 @@ export function AppLayout({ children }: AppLayoutProps) {
   };
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-gray-950">
-        
+    <NotificationProvider>
+      <ToastProvider>
+        <div className="min-h-screen bg-gray-950">
+          <DashboardHeader />
 
-        {/* Main Content */}
-        <div className={`transition-all duration-300 ${
-          sidebarCollapsed ? 'ml-16' : 'ml-64'
-        }`}>
-          <main className="min-h-screen">
-            {children}
-          </main>
+          {/* Main Content */}
+          <div className={`transition-all duration-300 ${
+            sidebarCollapsed ? 'ml-16' : 'ml-64'
+          }`}>
+            <main className="min-h-screen">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
-    </ToastProvider>
+      </ToastProvider>
+    </NotificationProvider>
   );
 }
 

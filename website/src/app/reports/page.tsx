@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardHeader from '@/components/dashboard/Header';
 import { getReportPeriod } from "@/lib/reports/api";
 import { Calendar, FileText, AlertCircle, RefreshCw, Clock, Download, FileSpreadsheet, File } from 'lucide-react';
 import { useNotifications } from '@/components/NotificationCenter';
@@ -73,9 +72,7 @@ export default function ReportsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-emerald-900">
-        <DashboardHeader />
-        <div className="container mx-auto px-6 py-8 w-full max-w-6xl">
+      <div className="container mx-auto px-6 py-8 w-full max-w-6xl">
             {/* Header */}
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
@@ -231,7 +228,6 @@ export default function ReportsPage() {
               </div>
             </div>
         </div>
-      </div>
     </ProtectedRoute>
   );
 }

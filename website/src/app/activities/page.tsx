@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { getActivities } from "@/lib/activities/api";
 import { fetchFacilities } from "@/lib/tenants/api";
-import DashboardHeader from '@/components/dashboard/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Link from 'next/link';
 import type { Activity } from "@/types/activities/activitytypes";
@@ -264,10 +263,7 @@ export default function ActivitiesPage() {
 
   return (
     <ProtectedRoute>
-      <div>
-        <DashboardHeader />
-        <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-          <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -494,8 +490,6 @@ export default function ActivitiesPage() {
               </div>
             )}
           </div>
-        </div>
-      </div>
     </ProtectedRoute>
   );
 }

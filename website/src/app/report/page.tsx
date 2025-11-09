@@ -1,11 +1,10 @@
 import ReportsSidebar from '@/components/reports/ReportsSidebar';
 import EmissionsActivityReport from '@/components/reports/EmissionsActivityReport';
-import DashboardHeader from '@/components/dashboard/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function ReportsPage() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-900 via-emerald-900 to-slate-800">
-      <DashboardHeader />
+    <ProtectedRoute>
       <div className="flex min-h-screen">
         <ReportsSidebar />
 
@@ -15,6 +14,6 @@ export default function ReportsPage() {
           </div>
         </main>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

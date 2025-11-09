@@ -9,10 +9,33 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { me } from '@/app/api/auth/me/route';
 
 export default function AdminSidebar() {
   const [activeItem, setActiveItem] = useState('Admin');
+  const [userData, setUserData] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const data = await me();
+        setUserData({
+          name: data.email.split('@')[0], // Use email prefix as display name
+          email: data.email,
+        });
+      } catch (err) {
+        console.error('Failed to load user data:', err);
+        // Fallback to generic admin user
+        setUserData({
+          name: 'Admin',
+          email: 'admin@company.com',
+        });
+      }
+    };
+
+    loadUserData();
+  }, []);
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
@@ -38,8 +61,12 @@ export default function AdminSidebar() {
             />
           </div>
           <div>
-            <div className="text-white font-semibold">Admin User</div>
-            <div className="text-gray-400 text-sm">admin.user@example.com</div>
+            <div className="text-white font-semibold">
+              {userData ? userData.name : 'Loading...'}
+            </div>
+            <div className="text-gray-400 text-sm">
+              {userData ? userData.email : 'Loading...'}
+            </div>
           </div>
         </div>
       </div>
