@@ -1,7 +1,8 @@
 "use client";
 
 import { Target, Plus, TrendingUp, Calendar, CheckCircle, AlertCircle } from 'lucide-react';
-import DashboardHeader from '@/components/dashboard/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 
 interface Goal {
@@ -98,26 +99,20 @@ export default function GoalsPage() {
   const overdueGoals = goals.filter(g => g.status === 'overdue');
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-      <DashboardHeader />
-      <div className="container mx-auto px-6 py-8">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-              <Target className="w-8 h-8 text-emerald-400" />
-              Carbon Goals
-            </h1>
-            <p className="text-gray-400">Set and track your carbon reduction objectives</p>
-          </div>
-
+    <ProtectedRoute>
+      <PageLayout
+        title="Carbon Goals"
+        description="Set and track your carbon reduction objectives"
+        icon={Target}
+        actions={
           <button
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
           >
             <Plus className="w-4 h-4" />
             Create Goal
           </button>
-        </div>
+        }
+      >
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -209,7 +204,7 @@ export default function GoalsPage() {
             </>
           )}
         </div>
-      </div>
-    </div>
+      </PageLayout>
+    </ProtectedRoute>
   );
 }

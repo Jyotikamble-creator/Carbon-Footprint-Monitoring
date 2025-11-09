@@ -6,7 +6,6 @@ import AlternativeStates from '@/components/upload/AlternativeStates';
 import { uploadCsv } from '@/lib/ingest/api';
 import type { IngestResponse } from '@/types/ingest/ingesttypes';
 import { FileText } from 'lucide-react';
-import { useNotifications } from '@/components/NotificationCenter';
 
 export default function UploadActivityContent() {
   const [uploadState, setUploadState] = useState<'idle' | 'ready' | 'uploading' | 'complete' | 'error'>('idle');
@@ -14,7 +13,6 @@ export default function UploadActivityContent() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadResult, setUploadResult] = useState<IngestResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { addNotification } = useNotifications();
 
   const handleFileSelect = (selectedFile: File) => {
     setFile(selectedFile);
@@ -56,26 +54,12 @@ export default function UploadActivityContent() {
       setUploadProgress(100);
       setUploadResult(result);
       setUploadState('complete');
-
-      // Send success notification
-      addNotification({
-        type: 'success',
-        title: 'Data Upload Complete',
-        message: `Successfully processed ${result.created_events} events and calculated ${result.created_emissions} emissions.`,
-      });
       
     } catch (err) {
       console.error('Upload failed:', err);
       setError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
       setUploadState('error');
       setUploadProgress(0);
-
-      // Send error notification
-      addNotification({
-        type: 'error',
-        title: 'Upload Failed',
-        message: err instanceof Error ? err.message : 'Upload failed. Please check your file and try again.',
-      });
     }
   };
 

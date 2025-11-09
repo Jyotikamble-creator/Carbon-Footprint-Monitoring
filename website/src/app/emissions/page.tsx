@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { listEmissions, recomputeEmissions } from "@/lib/emissions/api";
 import { fetchFacilities } from "@/lib/tenants/api";
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageLayout } from '@/components/layout/PageLayout';
 import type { Emission } from "@/types/emission/emissiontypes";
 import type { Facility } from "@/types/tenants/tenantstypes";
 import {
@@ -189,36 +190,30 @@ export default function EmissionsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-        <div className="container mx-auto px-6 py-8">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-                  <Calculator className="w-8 h-8 text-emerald-400" />
-                  Emissions History
-                </h1>
-                <p className="text-gray-400">View and manage your carbon emissions data</p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-800/60 border border-gray-700 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"
-                >
-                  <Filter className="w-4 h-4" />
-                  Filters
-                </button>
-                <button
-                  onClick={loadEmissions}
-                  disabled={loading}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 text-white rounded-lg transition-colors"
-                >
-                  <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                  Refresh
-                </button>
-              </div>
-            </div>
+      <PageLayout 
+        title="Emissions History"
+        description="View and manage your carbon emissions data"
+        icon={Calculator}
+        actions={
+          <>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800/60 border border-gray-700 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"
+            >
+              <Filter className="w-4 h-4" />
+              Filters
+            </button>
+            <button
+              onClick={loadEmissions}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 text-white rounded-lg transition-colors"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </>
+        }
+      >
 
             {/* Filters Panel */}
             {showFilters && (
@@ -523,8 +518,7 @@ export default function EmissionsPage() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
+      </PageLayout>
     </ProtectedRoute>
   );
 }

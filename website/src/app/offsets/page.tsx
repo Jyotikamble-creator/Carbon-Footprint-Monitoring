@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Leaf, ShoppingCart, DollarSign, MapPin, Users, Award, CheckCircle } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 interface OffsetProject {
   id: number;
@@ -129,12 +130,12 @@ function ProjectCard({ project, onPurchase }: ProjectCardProps) {
 }
 
 export default function CarbonOffsetsPage() {
-  // TODO: Replace with API call to fetch carbon offset projects
+  // Carbon offset projects would be fetched from API in production
   const projects: OffsetProject[] = [];
 
   const handlePurchase = (project: OffsetProject, amount: number) => {
-    // In real app, this would integrate with payment processor
-    alert(`Purchasing ${amount} tons of carbon credits from "${project.name}" for $${(amount * project.pricePerTon).toLocaleString()}`);
+    // This would integrate with payment processor in production
+    console.log(`Purchase request: ${amount} tons from "${project.name}" for $${(amount * project.pricePerTon).toLocaleString()}`);
   };
 
   // const totalCartValue = cart.reduce((sum, item) => sum + (item.amount * item.project.pricePerTon), 0);
@@ -142,31 +143,11 @@ export default function CarbonOffsetsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-              <Leaf className="w-8 h-8 text-emerald-400" />
-              Carbon Offset Marketplace
-            </h1>
-            <p className="text-gray-400">Purchase verified carbon credits to offset your emissions</p>
-          </div>
-
-          {/* {cart.length > 0 && (
-            <div className="bg-emerald-600/20 border border-emerald-500/50 rounded-lg px-4 py-3">
-              <div className="flex items-center gap-3">
-                <ShoppingCart className="w-5 h-5 text-emerald-400" />
-                <div>
-                  <div className="text-white font-semibold">
-                    {totalCartCredits} tons • ${totalCartValue.toLocaleString()}
-                  </div>
-                  <div className="text-emerald-400 text-sm">Ready to checkout</div>
-                </div>
-              </div>
-            </div>
-          )} */}
-        </div>
+      <PageLayout
+        title="Carbon Offset Marketplace"
+        description="Purchase verified carbon credits to offset your emissions"
+        icon={Leaf}
+      >
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -247,7 +228,7 @@ export default function CarbonOffsetsPage() {
             </div>
           </div>
         </div>
-      </div>
+      </PageLayout>
     </ProtectedRoute>
   );
 }

@@ -1,26 +1,19 @@
 'use client';
 
-import { Sun, Moon, LogOut, User, Bell } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { logout } from '@/lib/auth/authSlice';
-import { useTheme } from '@/lib/theme/ThemeContext';
-import { useNotifications } from '@/components/NotificationCenter';
 
 export default function DashboardHeader() {
-  const { isDarkMode, toggleTheme } = useTheme();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAppSelector((state) => state.auth);
-  const { notifications, removeNotification, clearAll } = useNotifications();
-
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   // Determine active tab based on current pathname
   const getActiveTab = (path: string) => {
@@ -139,108 +132,10 @@ export default function DashboardHeader() {
 
           {/* Right Section */}
           <div className="flex items-center gap-4">
-            {/* Notifications */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  setShowUserMenu(false);
-                }}
-                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300 relative"
-              >
-                <Bell className="w-5 h-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-                  <div className="p-4 border-b border-gray-700 flex items-center justify-between">
-                    <h3 className="text-white font-semibold">Notifications</h3>
-                    {notifications.length > 0 && (
-                      <button
-                        onClick={clearAll}
-                        className="text-sm text-gray-400 hover:text-white transition-colors"
-                      >
-                        Clear All
-                      </button>
-                    )}
-                  </div>
-                  
-                  <div className="max-h-80 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <div className="p-4 text-center text-gray-400">
-                        No notifications
-                      </div>
-                    ) : (
-                      notifications.slice(0, 10).map((notification) => (
-                        <div
-                          key={notification.id}
-                          className={`p-4 border-b border-gray-700/50 hover:bg-gray-700/30 transition-colors ${
-                            !notification.read ? 'bg-gray-700/20' : ''
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-2 ${
-                              notification.type === 'success' ? 'bg-green-500' :
-                              notification.type === 'error' ? 'bg-red-500' :
-                              notification.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-                            }`} />
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-white font-medium text-sm">{notification.title}</h4>
-                              <p className="text-gray-300 text-sm mt-1">{notification.message}</p>
-                              <p className="text-gray-500 text-xs mt-2">
-                                {notification.timestamp.toLocaleTimeString()}
-                              </p>
-                              {notification.action && (
-                                <button
-                                  onClick={() => {
-                                    notification.action?.onClick();
-                                    setShowNotifications(false);
-                                  }}
-                                  className="mt-2 text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-colors"
-                                >
-                                  {notification.action.label}
-                                </button>
-                              )}
-                            </div>
-                            <button
-                              onClick={() => removeNotification(notification.id)}
-                              className="text-gray-400 hover:text-white transition-colors shrink-0"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300"
-            >
-              {isDarkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-
             {/* User Menu */}
             <div className="relative">
               <button 
-                onClick={() => {
-                  setShowUserMenu(!showUserMenu);
-                  setShowNotifications(false);
-                }}
+                onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300"
               >
                 <User className="w-5 h-5" />

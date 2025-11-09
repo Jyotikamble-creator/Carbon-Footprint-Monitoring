@@ -1,38 +1,27 @@
 "use client";
 
-import { useState, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import DashboardHeader from '@/components/dashboard/Header';
 import { ToastProvider } from '../ui/Toast';
-import { NotificationProvider } from '../NotificationCenter';
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
-
   return (
-    <NotificationProvider>
-      <ToastProvider>
-        <div className="min-h-screen bg-gray-950">
-          <DashboardHeader />
+    <ToastProvider>
+      <div className="min-h-screen bg-gray-950">
+        <DashboardHeader />
 
-          {/* Main Content */}
-          <div className={`transition-all duration-300 ${
-            sidebarCollapsed ? 'ml-16' : 'ml-64'
-          }`}>
-            <main className="min-h-screen">
-              {children}
-            </main>
-          </div>
+        {/* Main Content */}
+        <div className="w-full">
+          <main className="min-h-screen">
+            {children}
+          </main>
         </div>
-      </ToastProvider>
-    </NotificationProvider>
+      </div>
+    </ToastProvider>
   );
 }
 

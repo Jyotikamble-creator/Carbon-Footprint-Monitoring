@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { BarChart3, TrendingUp, TrendingDown, Award, Users, Building, Target, Calendar } from 'lucide-react';
-import DashboardHeader from '@/components/dashboard/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 interface BenchmarkData {
   industry: string;
@@ -237,31 +238,23 @@ export default function BenchmarksPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-      <DashboardHeader />
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-              <BarChart3 className="w-8 h-8 text-emerald-400" />
-              Industry Benchmarks
-            </h1>
-            <p className="text-gray-400">Compare your carbon performance against industry standards</p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <select
-              value={selectedIndustry}
-              onChange={(e) => setSelectedIndustry(e.target.value)}
-              className="px-4 py-2 bg-gray-800/60 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              {industries.map(industry => (
-                <option key={industry} value={industry}>{industry}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+    <ProtectedRoute>
+      <PageLayout
+        title="Industry Benchmarks"
+        description="Compare your carbon performance against industry standards"
+        icon={BarChart3}
+        actions={
+          <select
+            value={selectedIndustry}
+            onChange={(e) => setSelectedIndustry(e.target.value)}
+            className="px-4 py-2 bg-gray-800/60 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            {industries.map(industry => (
+              <option key={industry} value={industry}>{industry}</option>
+            ))}
+          </select>
+        }
+      >
 
         {/* Controls Header */}
         <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-8">
@@ -402,7 +395,7 @@ export default function BenchmarksPage() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </PageLayout>
+    </ProtectedRoute>
   );
 }

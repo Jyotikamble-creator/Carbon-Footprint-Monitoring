@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { PageLayout } from '@/components/layout/PageLayout';
 import { getKpis, getTrend, getSummary } from "@/lib/analytics/api";
 import type { KpisResponse, TrendPoint, SummaryResponse } from "@/types/analytics/analyticstypes";
 import { 
@@ -119,8 +120,12 @@ export default function AnalyticsPage() {
 
   return (
     <ProtectedRoute requiredRole="viewer">
-      <div className="container mx-auto px-6 py-8">
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-8">
+      <PageLayout
+        title="Analytics Dashboard"
+        description="Comprehensive emissions analytics and insights"
+        icon={TrendingUp}
+      >
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-8">
           <div className="flex flex-wrap items-center gap-4 mb-4">
             <Calendar className="w-5 h-5 text-emerald-400" />
             <span className="text-white font-medium">Date Range:</span>
@@ -432,7 +437,7 @@ export default function AnalyticsPage() {
               </div>
             </div>
           )}
-        </div>
+      </PageLayout>
     </ProtectedRoute>
   );
 }

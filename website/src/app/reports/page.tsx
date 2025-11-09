@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { PageLayout } from '@/components/layout/PageLayout';
 import { getReportPeriod } from "@/lib/reports/api";
 import { Calendar, FileText, AlertCircle, RefreshCw, Clock, Download, FileSpreadsheet, File } from 'lucide-react';
-import { useNotifications } from '@/components/NotificationCenter';
 
 export default function ReportsPage() {
   const [reportData, setReportData] = useState<string | null>(null);
@@ -19,36 +19,16 @@ export default function ReportsPage() {
     return new Date().toISOString().split('T')[0];
   });
   const [format, setFormat] = useState<'csv' | 'pdf'>('csv');
-  const { addNotification } = useNotifications();
-
   async function generateReport() {
     setLoading(true);
     setError(null);
     try {
       const data = await getReportPeriod(fromDate, toDate, format);
       setReportData(data);
-
-      // Send success notification
-      addNotification({
-        type: 'success',
-        title: 'Report Generated',
-        message: `Your ${format.toUpperCase()} report for ${fromDate} to ${toDate} is ready for download.`,
-        action: {
-          label: 'Download',
-          onClick: () => downloadReport()
-        }
-      });
     } catch (err: unknown) {
       console.error('Report generation error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate report';
       setError(errorMessage);
-
-      // Send error notification
-      addNotification({
-        type: 'error',
-        title: 'Report Generation Failed',
-        message: errorMessage,
-      });
     } finally {
       setLoading(false);
     }
@@ -72,15 +52,11 @@ export default function ReportsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="container mx-auto px-6 py-8 w-full max-w-6xl">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-                <Calendar className="w-8 h-8 text-emerald-400" />
-                Reports
-              </h1>
-              <p className="text-gray-400">Generate and download emissions reports in CSV or PDF format</p>
-            </div>
+      <PageLayout
+        title="Reports"
+        description="Generate and download emissions reports in CSV or PDF format"
+        icon={Calendar}
+      >
 
             {/* Main Content Card */}
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700/50 w-full max-w-4xl mx-auto">
@@ -227,7 +203,7 @@ export default function ReportsPage() {
                 )}
               </div>
             </div>
-        </div>
+      </PageLayout>
     </ProtectedRoute>
   );
 }
