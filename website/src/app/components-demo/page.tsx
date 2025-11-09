@@ -9,56 +9,14 @@ import { FormField, FormSelect, FormTextarea, FormCheckbox } from '../../compone
 import { useFormValidation, validationRules } from '../../hooks/useFormValidation';
 import { useToast } from '../../components/ui/Toast';
 import { TrendingUp, Users, Leaf, DollarSign, Plus, Edit, Trash2 } from 'lucide-react';
-import DashboardHeader from '@/components/dashboard/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Mock data for demonstration
-const mockKpiData = [
-  {
-    title: 'Total Emissions',
-    value: '2,450',
-    unit: 'tons CO₂e',
-    trend: { value: 12.5, isPositive: false },
-    color: 'red' as const
-  },
-  {
-    title: 'Active Users',
-    value: '1,234',
-    unit: 'users',
-    trend: { value: 8.2, isPositive: true },
-    color: 'blue' as const
-  },
-  {
-    title: 'Carbon Credits',
-    value: '15,670',
-    unit: 'credits',
-    trend: { value: 24.1, isPositive: true },
-    color: 'green' as const
-  },
-  {
-    title: 'Cost Savings',
-    value: '$45,230',
-    unit: 'saved',
-    trend: { value: 15.3, isPositive: true },
-    color: 'emerald' as const
-  }
-];
+const mockKpiData: any[] = [];
 
-const mockTableData = [
-  { id: 1, name: 'Office Building A', emissions: 1250, status: 'Active', lastUpdated: '2024-01-15' },
-  { id: 2, name: 'Manufacturing Plant', emissions: 3450, status: 'Active', lastUpdated: '2024-01-14' },
-  { id: 3, name: 'Warehouse Complex', emissions: 890, status: 'Inactive', lastUpdated: '2024-01-13' },
-  { id: 4, name: 'Retail Store', emissions: 567, status: 'Active', lastUpdated: '2024-01-12' },
-  { id: 5, name: 'Data Center', emissions: 2100, status: 'Active', lastUpdated: '2024-01-11' }
-];
+const mockTableData: any[] = [];
 
-const mockChartData = [
-  { month: 'Jan', emissions: 2400, target: 2200 },
-  { month: 'Feb', emissions: 1398, target: 2200 },
-  { month: 'Mar', emissions: 9800, target: 2200 },
-  { month: 'Apr', emissions: 3908, target: 2200 },
-  { month: 'May', emissions: 4800, target: 2200 },
-  { month: 'Jun', emissions: 3800, target: 2200 }
-];
+const mockChartData: any[] = [];
 
 export default function ComponentsDemoPage() {
   const { success, error, warning, info } = useToast();
@@ -125,10 +83,8 @@ export default function ComponentsDemoPage() {
   ];
 
   return (
-    <div>
-      <DashboardHeader />
-      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-        <div className="p-6 space-y-8">
+    <ProtectedRoute>
+      <div className="p-6 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -149,18 +105,24 @@ export default function ComponentsDemoPage() {
         <section>
           <h2 className="text-xl font-semibold text-white mb-4">KPI Cards</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {mockKpiData.map((kpi, index) => (
-              <KpiCard
-                key={index}
-                title={kpi.title}
-                value={kpi.value}
-                subtitle={kpi.unit}
-                trend={kpi.trend.isPositive ? 'up' : 'down'}
-                trendValue={`${kpi.trend.value}%`}
-                color={kpi.color}
-                loading={index === 2} // Demo loading state
-              />
-            ))}
+            {mockKpiData.length > 0 ? (
+              mockKpiData.map((kpi, index) => (
+                <KpiCard
+                  key={index}
+                  title={kpi.title}
+                  value={kpi.value}
+                  subtitle={kpi.unit}
+                  trend={kpi.trend.isPositive ? 'up' : 'down'}
+                  trendValue={`${kpi.trend.value}%`}
+                  color={kpi.color}
+                  loading={index === 2} // Demo loading state
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8 text-gray-400">
+                No KPI data available. This section demonstrates KPI card components.
+              </div>
+            )}
           </div>
         </section>
 
@@ -183,15 +145,21 @@ export default function ComponentsDemoPage() {
         {/* Data Table */}
         <section>
           <h2 className="text-xl font-semibold text-white mb-4">Data Table</h2>
-          <DataTable
-            data={mockTableData}
-            columns={tableColumns}
-            searchable
-            sortable
-            pagination
-            pageSize={3}
-            exportable
-          />
+          {mockTableData.length > 0 ? (
+            <DataTable
+              data={mockTableData}
+              columns={tableColumns}
+              searchable
+              sortable
+              pagination
+              pageSize={3}
+              exportable
+            />
+          ) : (
+            <div className="bg-gray-900 rounded-lg p-6 text-center text-gray-400">
+              No table data available. This section demonstrates data table components.
+            </div>
+          )}
         </section>
 
         {/* Form Components */}
@@ -318,7 +286,6 @@ export default function ComponentsDemoPage() {
           type="danger"
         />
       </div>
-    </div>
-  </div>
+    </ProtectedRoute>
   );
 }

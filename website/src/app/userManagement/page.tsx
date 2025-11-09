@@ -1,48 +1,46 @@
 // app/user-management/page.tsx
  'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import UserTable from '@/ui/userManagement/Table';
 import SearchBar from '@/ui/userManagement/SearchBar';
 import { User } from '@/types/auth/user';
-import DashboardHeader from '@/components/dashboard/Header';
+import { fetchUsers } from '@/app/api/tenants/fetchUser/route';
+import { useToast } from '@/components/ui/Toast';
+import type { TenantUser } from '@/types/tenants/tenantstypes';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function UserManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [users] = useState<User[]>([
-    {
-      id: '1',
-      name: 'Eleanor Vance',
-      email: 'eleanor@example.com',
-      role: 'Admin',
-      status: 'Active',
-      lastActive: '2 days ago',
-    },
-    {
-      id: '2',
-      name: 'Marcus Holloway',
-      email: 'marcus@example.com',
-      role: 'Member',
-      status: 'Active',
-      lastActive: '5 hours ago',
-    },
-    {
-      id: '3',
-      name: 'Clara Oswald',
-      email: 'clara@example.com',
-      role: 'Viewer',
-      status: 'Pending',
-      lastActive: 'N/A',
-    },
-    {
-      id: '4',
-      name: 'James Sullivan',
-      email: 'james@example.com',
-      role: 'Member',
-      status: 'Inactive',
-      lastActive: '1 month ago',
-    },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { error: showError } = useToast();
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const tenantUsers = await fetchUsers();
+        // Convert TenantUser to User format
+        const convertedUsers: User[] = tenantUsers.map((tenantUser: TenantUser) => ({
+          id: tenantUser.id.toString(),
+          name: tenantUser.email.split('@')[0], // Use email prefix as name
+          email: tenantUser.email,
+          role: tenantUser.role as 'Admin' | 'Member' | 'Viewer',
+          status: tenantUser.is_active ? 'Active' : 'Inactive',
+          lastActive: 'N/A', // API doesn't provide this info
+        }));
+        setUsers(convertedUsers);
+      } catch (err) {
+        console.error('Failed to load users:', err);
+        showError('Failed to load users', 'Please try again later');
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, [showError]);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -51,8 +49,7 @@ export default function UserManagementPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a1a1a] text-white">
-      <DashboardHeader />
+    <ProtectedRoute>
       <div className="max-w-7xl mx-auto p-8">
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -68,8 +65,12 @@ export default function UserManagementPage() {
         </div>
 
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        <UserTable users={filteredUsers} totalUsers={32} />
+        {loading ? (
+          <div className="text-center py-8 text-gray-400">Loading users...</div>
+        ) : (
+          <UserTable users={filteredUsers} totalUsers={users.length} />
+        )}
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

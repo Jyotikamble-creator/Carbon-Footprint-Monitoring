@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Leaf, ShoppingCart, DollarSign, MapPin, Users, Award, CheckCircle } from 'lucide-react';
-import DashboardHeader from '@/components/dashboard/Header';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface OffsetProject {
   id: number;
@@ -141,8 +141,7 @@ export default function CarbonOffsetsPage() {
   // const totalCartCredits = cart.reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-      <DashboardHeader />
+    <ProtectedRoute>
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -249,6 +248,6 @@ export default function CarbonOffsetsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

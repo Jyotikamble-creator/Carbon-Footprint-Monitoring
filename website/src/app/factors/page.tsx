@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { listFactors, createFactor } from "@/lib/factors/api";
-import DashboardHeader from '@/components/dashboard/Header';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Calculator, Plus, Search, AlertCircle, Activity, TrendingUp } from 'lucide-react';
 import type { Factor, CreateFactorRequest } from "@/types/factors/factorstypes";
@@ -85,10 +84,8 @@ export default function FactorsPage() {
 
   return (
     <ProtectedRoute>
-      <div>
-        <DashboardHeader />
-        <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-          <main className="max-w-7xl mx-auto px-6 py-8">
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
+        <main className="max-w-7xl mx-auto px-6 py-8">
             {/* Header Section */}
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -338,7 +335,6 @@ export default function FactorsPage() {
             )}
           </main>
         </div>
-      </div>
     </ProtectedRoute>
   );
 }

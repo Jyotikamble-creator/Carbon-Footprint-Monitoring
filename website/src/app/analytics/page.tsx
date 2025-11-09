@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardHeader from '@/components/dashboard/Header';
 import { getKpis, getTrend, getSummary } from "@/lib/analytics/api";
 import type { KpisResponse, TrendPoint, SummaryResponse } from "@/types/analytics/analyticstypes";
 import { 
@@ -120,9 +119,7 @@ export default function AnalyticsPage() {
 
   return (
     <ProtectedRoute requiredRole="viewer">
-      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-        <DashboardHeader />
-        <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8">
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 mb-8">
           <div className="flex flex-wrap items-center gap-4 mb-4">
             <Calendar className="w-5 h-5 text-emerald-400" />
@@ -436,7 +433,6 @@ export default function AnalyticsPage() {
             </div>
           )}
         </div>
-      </div>
     </ProtectedRoute>
   );
 }

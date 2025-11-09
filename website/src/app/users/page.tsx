@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardHeader from '@/components/dashboard/Header';
 import { Users, UserPlus, Mail, Shield, Eye, EyeOff, Edit2, Trash2, Search, AlertCircle, Loader2 } from 'lucide-react';
 import { useUsers, useCreateUser } from '@/lib/tenants/hooks';
 import type { TenantUser, CreateUserRequest } from '@/types/tenants/tenantstypes';
@@ -58,10 +57,7 @@ export default function UsersPage() {
 
   return (
     <ProtectedRoute>
-      <div>
-        <DashboardHeader />
-        <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-emerald-900">
-          <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -319,8 +315,6 @@ export default function UsersPage() {
               </div>
             )}
           </div>
-        </div>
-      </div>
     </ProtectedRoute>
   );
 }

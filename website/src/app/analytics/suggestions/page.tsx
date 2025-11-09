@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardHeader from '@/components/dashboard/Header';
 import { getSuggestions } from "@/lib/analytics/api";
 import type { SuggestionResponse } from "@/types/analytics/analyticstypes";
 import ReactMarkdown from 'react-markdown';
@@ -77,7 +76,8 @@ export default function SuggestionsPage() {
 
   return (
     <ProtectedRoute requiredRole="analyst">
-      <React.Fragment>
+      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
+        <div className="container mx-auto px-6 py-8">
         {error && (
           <div className="bg-red-900/30 border border-red-700/50 rounded-lg p-4 flex items-center gap-3 mb-8">
             <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
@@ -279,7 +279,8 @@ export default function SuggestionsPage() {
                 </div>
               </div>
             )}
-      </React.Fragment>
+        </div>
+      </div>
     </ProtectedRoute>
   );
 }

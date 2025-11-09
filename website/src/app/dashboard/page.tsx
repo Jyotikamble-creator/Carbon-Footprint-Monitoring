@@ -1,5 +1,4 @@
 import ProtectedRoute from '@/components/ProtectedRoute';
-import DashboardHeader from '@/components/dashboard/Header';
 import StatsCards from '@/components/dashboard/StatsCards';
 import EmissionsTrend from '@/components/dashboard/EmissionTrend';
 import EmissionsByScope from '@/components/dashboard/EmissionByScope';
@@ -7,10 +6,7 @@ import EmissionsByScope from '@/components/dashboard/EmissionByScope';
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900">
-        <DashboardHeader />
-
-        <main className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Page Title and Filter */}
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-4xl font-bold text-white">Emissions Dashboard</h1>
@@ -37,7 +33,6 @@ export default function DashboardPage() {
             <EmissionsTrend />
             <EmissionsByScope />
           </div>
-        </main>
       </div>
     </ProtectedRoute>
   );

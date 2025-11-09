@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/lib/hooks';
+import { AppLayout } from '@/components/layout/AppLayout';
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -43,12 +44,14 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   // If we have a token but no user yet, show a loading state while the app fetches the current user.
   if (token && !user) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900 flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
+      <AppLayout>
+        <div className="min-h-screen bg-linear-to-br from-gray-900 via-emerald-950 to-gray-900 flex items-center justify-center">
+          <div className="text-white text-center">
+            <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p>Loading...</p>
+          </div>
         </div>
-      </div>
+      </AppLayout>
     );
   }
 
@@ -61,5 +64,5 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   // At this point we have a token and a user
   if (!user) return null;
 
-  return <>{children}</>;
+  return <AppLayout>{children}</AppLayout>;
 }
